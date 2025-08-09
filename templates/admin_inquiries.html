@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة الاستفسارات والشكاوى - المشرف</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Typing effect */
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+
+        .typing-text {
+            border-right: 3px solid #fbbf24;
+            white-space: nowrap;
+            animation: typing 3s steps(40, end), blink 0.75s step-end infinite;
+        }
+
+        /* CTA Button */
+        .cta-button {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Glass effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .typing-text {
+                font-size: 1.5rem;
+                line-height: 2rem;
+                animation: none;
+                border-right: none;
+                white-space: normal;
+            }
+        }
+    </style>
+</head>
+<body class="font-['Cairo'] bg-gradient-to-br from-blue-50 to-green-100 min-h-screen">
+    <!-- Header & Hero Section -->
+    <section class="relative bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900 text-white overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 bg-black/20"></div>
+        
+        <!-- Header Navigation -->
+        <div class="relative z-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-32 md:h-36 lg:h-40">
+                    <!-- Right: Logo -->
+                    <div class="flex items-center flex-shrink-0">
+                        {% if school_settings and school_settings.school_logo %}
+                            <img src="/assets/images/{{ school_settings.school_logo }}" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto">
+                        {% else %}
+                            <img src="/assets/images/logo.png" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto">
+                        {% endif %}
+                    </div>
+                    <!-- Center: School Name (always visible) -->
+                    <div class="flex-1 flex justify-center">
+                        <span class="text-base md:text-3xl font-extrabold text-yellow-400 tracking-wide font-['Cairo','Noto Kufi Arabic',sans-serif] select-none">
+                            {% if school_settings and school_settings.school_name %}
+                                {{ school_settings.school_name }}
+                            {% else %}
+                                سجل بيانات المدرسة من الاعدادات
+                            {% endif %}
+                        </span>
+                    </div>
+                    <!-- Left: Navigation & Hamburger -->
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <!-- Desktop Nav -->
+                        <nav class="hidden md:flex items-center space-x-1 space-x-reverse mr-4">
+                            <a href="/admin" class="px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition">لوحة التحكم</a>
+                            <a href="/logout" class="px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition">تسجيل الخروج</a>
+                        </nav>
+                        <!-- Mobile menu button -->
+                        <button onclick="toggleMobileMenu()" class="md:hidden flex items-center justify-center w-11 h-11 rounded-lg bg-white/10 text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 transition" aria-label="فتح القائمة">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white/10 backdrop-blur-md border-t border-white/10 z-40 relative">
+            <nav class="flex flex-col py-2 px-4 space-y-1">
+                <a href="/admin" class="block px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition">لوحة التحكم</a>
+                <a href="/logout" class="block px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition">تسجيل الخروج</a>
+            </nav>
+        </div>
+
+        <!-- Hero Content -->
+        <div class="relative z-10 pb-32">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+                <div class="text-center">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-6 typing-text mt-16">
+                        إدارة الاستفسارات والشكاوى
+                    </h1>
+                    <p class="text-xl md:text-2xl text-white/80 mb-8 max-w-3xl mx-auto mt-8">
+                        مراجعة والرد على استفسارات الطلاب
+                    </p>
+                    <div class="flex justify-center">
+                        <button class="cta-button bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300">
+                            مراجعة الاستفسارات
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- أيقونة الرئيسية -->
+    <div class="fixed left-4 top-1/2 transform -translate-y-1/2 z-50">
+        <a href="/admin" class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl">
+            <i class="fas fa-home text-xl"></i>
+        </a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- إحصائيات سريعة -->
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-inbox text-blue-600 text-xl"></i>
+                        </div>
+                        <div class="mr-4">
+                            <p class="text-sm text-gray-500">إجمالي الاستفسارات</p>
+                            <p class="text-2xl font-bold text-gray-800">{{ total_inquiries }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-clock text-yellow-600 text-xl"></i>
+                        </div>
+                        <div class="mr-4">
+                            <p class="text-sm text-gray-500">قيد المراجعة</p>
+                            <p class="text-2xl font-bold text-gray-800">{{ pending_inquiries }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-check text-green-600 text-xl"></i>
+                        </div>
+                        <div class="mr-4">
+                            <p class="text-sm text-gray-500">تم الرد</p>
+                            <p class="text-2xl font-bold text-gray-800">{{ responded_inquiries }}</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-users text-purple-600 text-xl"></i>
+                        </div>
+                        <div class="mr-4">
+                            <p class="text-sm text-gray-500">طلاب متفاعلين</p>
+                            <p class="text-2xl font-bold text-gray-800">{{ unique_students }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- نظام التحكم في تفعيل/إلغاء تفعيل الاستفسارات -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <!-- تحكم استفسارات الطلاب -->
+                <div class="bg-gradient-to-r from-green-50 to-blue-50 rounded-lg border border-green-200 p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3 space-x-reverse">
+                            <div class="flex items-center">
+                                <i class="fas fa-user-graduate text-green-600 ml-2"></i>
+                                <span class="text-sm font-medium text-gray-700 ml-2">استفسارات الطلاب:</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if student_inquiries_enabled == '1' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                    {% if student_inquiries_enabled == '1' %}
+                                        <i class="fas fa-check-circle ml-1"></i>مفعلة
+                                    {% else %}
+                                        <i class="fas fa-times-circle ml-1"></i>معطلة
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <form method="POST" action="/admin/inquiries/toggle_student_feature" class="flex-shrink-0">
+                            <input type="hidden" name="action" value="{% if student_inquiries_enabled == '1' %}disable{% else %}enable{% endif %}">
+                            <button type="submit" class="px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105 {% if student_inquiries_enabled == '1' %}bg-orange-500 hover:bg-orange-600 text-white{% else %}bg-green-500 hover:bg-green-600 text-white{% endif %}">
+                                <i class="fas {% if student_inquiries_enabled == '1' %}fa-pause ml-1{% else %}fa-play ml-1{% endif %}"></i>
+                                {% if student_inquiries_enabled == '1' %}
+                                    إيقاف مؤقت
+                                {% else %}
+                                    تفعيل
+                                {% endif %}
+                            </button>
+                        </form>
+                    </div>
+                    <div class="mt-2 text-xs text-gray-600 text-center">
+                        {% if student_inquiries_enabled == '1' %}
+                            <i class="fas fa-info-circle ml-1"></i>الطلاب يمكنهم إرسال استفسارات وشكاوى
+                        {% else %}
+                            <i class="fas fa-exclamation-triangle ml-1"></i>استفسارات الطلاب معطلة مؤقتاً
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- تحكم استفسارات المعلمين -->
+                <div class="bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-200 p-4">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-3 space-x-reverse">
+                            <div class="flex items-center">
+                                <i class="fas fa-chalkboard-teacher text-purple-600 ml-2"></i>
+                                <span class="text-sm font-medium text-gray-700 ml-2">استفسارات المعلمين:</span>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {% if teacher_inquiries_enabled == '1' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                    {% if teacher_inquiries_enabled == '1' %}
+                                        <i class="fas fa-check-circle ml-1"></i>مفعلة
+                                    {% else %}
+                                        <i class="fas fa-times-circle ml-1"></i>معطلة
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        <form method="POST" action="/admin/inquiries/toggle_teacher_feature" class="flex-shrink-0">
+                            <input type="hidden" name="action" value="{% if teacher_inquiries_enabled == '1' %}disable{% else %}enable{% endif %}">
+                            <button type="submit" class="px-4 py-2 rounded-lg transition-all duration-300 transform hover:scale-105 {% if teacher_inquiries_enabled == '1' %}bg-orange-500 hover:bg-orange-600 text-white{% else %}bg-green-500 hover:bg-green-600 text-white{% endif %}">
+                                <i class="fas {% if teacher_inquiries_enabled == '1' %}fa-pause ml-1{% else %}fa-play ml-1{% endif %}"></i>
+                                {% if teacher_inquiries_enabled == '1' %}
+                                    إيقاف مؤقت
+                                {% else %}
+                                    تفعيل
+                                {% endif %}
+                            </button>
+                        </form>
+                    </div>
+                    <div class="mt-2 text-xs text-gray-600 text-center">
+                        {% if teacher_inquiries_enabled == '1' %}
+                            <i class="fas fa-info-circle ml-1"></i>المعلمون يمكنهم إرسال استفسارات وشكاوى
+                        {% else %}
+                            <i class="fas fa-exclamation-triangle ml-1"></i>استفسارات المعلمين معطلة مؤقتاً
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- فلاتر البحث -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">الحالة</label>
+                        <select id="statusFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">جميع الحالات</option>
+                            <option value="قيد المراجعة">قيد المراجعة</option>
+                            <option value="تم الرد">تم الرد</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">نوع الرسالة</label>
+                        <select id="typeFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">جميع الأنواع</option>
+                            <option value="استفسار">استفسار</option>
+                            <option value="شكوى">شكوى</option>
+                            <option value="مقترح">مقترح</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">الصف</label>
+                        <select id="gradeFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">جميع الصفوف</option>
+                            {% for grade in grades %}
+                            <option value="{{ grade }}">{{ grade }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">الشعبة</label>
+                        <select id="sectionFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">جميع الشعب</option>
+                            {% for section in sections %}
+                            <option value="{{ section }}">{{ section }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">نوع المستخدم</label>
+                        <select id="userTypeFilter" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="">جميع الأنواع</option>
+                            {% for user_type in user_types %}
+                            <option value="{{ user_type }}">{{ user_type }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">بحث</label>
+                        <input type="text" id="searchInput" placeholder="ابحث في العنوان أو المحتوى..." class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div class="flex items-end">
+                        <button type="button" onclick="clearAllFilters()" class="w-full px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors">
+                            <i class="fas fa-times ml-1"></i>مسح الفلاتر
+                        </button>
+                    </div>
+                    {% if session.role == 'مشرف' %}
+                    <div class="flex items-end">
+                        <form method="POST" action="/admin/inquiries/delete_all" onsubmit="return confirm('هل أنت متأكد من حذف جميع الاستفسارات والشكاوى؟ هذا الإجراء لا يمكن التراجع عنه.');" class="w-full">
+                            <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-bold">
+                                <i class="fas fa-trash ml-1"></i>حذف الكل
+                            </button>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- قائمة الاستفسارات -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الاسم</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">النوع</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">العنوان</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">التاريخ</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الحالة</th>
+                                <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            {% for inquiry in inquiries.items %}
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">{{ inquiry.student_name }}</div>
+                                        {% if inquiry.user_type == 'طالب' %}
+                                            <div class="text-sm text-gray-500">{{ inquiry.student_grade }} / {{ inquiry.student_section }}</div>
+                                        {% else %}
+                                            <div class="text-sm text-gray-500">{{ inquiry.user_type }} - {{ inquiry.student_grade }}</div>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if inquiry.message_type == 'استفسار' %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            <i class="fas fa-question-circle ml-1"></i>استفسار
+                                        </span>
+                                    {% elif inquiry.message_type == 'شكوى' %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                            <i class="fas fa-exclamation-triangle ml-1"></i>شكوى
+                                        </span>
+                                    {% else %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            <i class="fas fa-lightbulb ml-1"></i>مقترح
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4">
+                                    <div class="text-sm text-gray-900 font-medium">{{ inquiry.title }}</div>
+                                    <div class="text-sm text-gray-500 truncate max-w-xs">{{ inquiry.message[:100] }}...</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {{ inquiry.submission_date.strftime('%Y-%m-%d') }}
+                                    <br>
+                                    {{ inquiry.submission_date.strftime('%H:%M') }}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    {% if inquiry.status == 'قيد المراجعة' %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                            قيد المراجعة
+                                        </span>
+                                    {% elif inquiry.status == 'تم الرد' %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                            تم الرد
+                                        </span>
+                                    {% else %}
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                            {{ inquiry.status }}
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <button data-inquiry-id="{{ inquiry.id }}" class="view-inquiry-btn text-blue-600 hover:text-blue-900 ml-3">
+                                        <i class="fas fa-eye"></i> عرض
+                                    </button>
+                                    {% if inquiry.status == 'قيد المراجعة' %}
+                                    <button data-inquiry-id="{{ inquiry.id }}" class="respond-inquiry-btn text-green-600 hover:text-green-900">
+                                        <i class="fas fa-reply"></i> رد
+                                    </button>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ترقيم الصفحات -->
+            {% if inquiries.pages > 1 %}
+            <div class="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 mt-4 rounded-lg shadow-md">
+                <div class="flex-1 flex justify-between sm:hidden">
+                    {% if inquiries.has_prev %}
+                    <a href="{{ url_for('admin_inquiries', page=inquiries.prev_num) }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        السابق
+                    </a>
+                    {% endif %}
+                    {% if inquiries.has_next %}
+                    <a href="{{ url_for('admin_inquiries', page=inquiries.next_num) }}" class="mr-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                        التالي
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                    <div>
+                        <p class="text-sm text-gray-700">
+                            عرض <span class="font-medium">{{ inquiries.first }}</span> إلى <span class="font-medium">{{ inquiries.last }}</span> من <span class="font-medium">{{ inquiries.total }}</span> نتيجة
+                        </p>
+                    </div>
+                    <div>
+                        <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                            {% if inquiries.has_prev %}
+                            <a href="{{ url_for('admin_inquiries', page=inquiries.prev_num) }}" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                            {% endif %}
+                            
+                            {% for page_num in inquiries.iter_pages() %}
+                                {% if page_num %}
+                                    {% if page_num != inquiries.page %}
+                                    <a href="{{ url_for('admin_inquiries', page=page_num) }}" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                        {{ page_num }}
+                                    </a>
+                                    {% else %}
+                                    <span class="relative inline-flex items-center px-4 py-2 border border-blue-500 bg-blue-50 text-sm font-medium text-blue-600">
+                                        {{ page_num }}
+                                    </span>
+                                    {% endif %}
+                                {% else %}
+                                <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+                                    ...
+                                </span>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if inquiries.has_next %}
+                            <a href="{{ url_for('admin_inquiries', page=inquiries.next_num) }}" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                            {% endif %}
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Modal عرض الاستفسار -->
+    <div id="inquiryModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900" id="modalTitle">تفاصيل الاستفسار</h3>
+                    <button onclick="closeModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <div id="modalContent">
+                    <!-- المحتوى سيتم تحميله ديناميكياً -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal الرد على الاستفسار -->
+    <div id="responseModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
+        <div class="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+            <div class="mt-3">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-medium text-gray-900">الرد على الاستفسار</h3>
+                    <button onclick="closeResponseModal()" class="text-gray-400 hover:text-gray-600">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <form id="responseForm" method="POST">
+                    <div class="mb-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">الرد</label>
+                        <textarea name="response" rows="6" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" placeholder="اكتب ردك هنا..."></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-3 space-x-reverse">
+                        <button type="button" onclick="closeResponseModal()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors">
+                            إلغاء
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                            <i class="fas fa-paper-plane ml-1"></i>إرسال الرد
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // عرض تفاصيل الاستفسار
+        function viewInquiry(inquiryId) {
+            fetch(`/admin/inquiries/${inquiryId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('modalContent').innerHTML = `
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">اسم الطالب</label>
+                                    <p class="text-gray-900">${data.student_name}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">الصف</label>
+                                    <p class="text-gray-900">${data.student_grade}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">الشعبة</label>
+                                    <p class="text-gray-900">${data.student_section}</p>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">نوع الرسالة</label>
+                                <p class="text-gray-900">${data.message_type}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">العنوان</label>
+                                <p class="text-gray-900">${data.title}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">الرسالة</label>
+                                <p class="text-gray-900 whitespace-pre-wrap">${data.message}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">رقم التليفون</label>
+                                <p class="text-gray-900">${data.phone}</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">تاريخ التقديم</label>
+                                <p class="text-gray-900">${data.submission_date}</p>
+                            </div>
+                            ${data.response ? `
+                            <div class="bg-blue-50 p-4 rounded-lg border-r-4 border-blue-500">
+                                <label class="block text-sm font-medium text-blue-800 mb-2">الرد</label>
+                                <p class="text-blue-700 whitespace-pre-wrap">${data.response}</p>
+                                <p class="text-sm text-blue-600 mt-2">آخر تحديث: ${data.last_updated}</p>
+                            </div>
+                            ` : ''}
+                        </div>
+                    `;
+                    document.getElementById('inquiryModal').classList.remove('hidden');
+                });
+        }
+
+        // إغلاق modal
+        function closeModal() {
+            document.getElementById('inquiryModal').classList.add('hidden');
+        }
+
+        // فتح modal الرد
+        function respondToInquiry(inquiryId) {
+            document.getElementById('responseForm').action = `/admin/inquiries/${inquiryId}/respond`;
+            document.getElementById('responseModal').classList.remove('hidden');
+        }
+
+        // إغلاق modal الرد
+        function closeResponseModal() {
+            document.getElementById('responseModal').classList.add('hidden');
+            document.getElementById('responseForm').reset();
+        }
+
+        // إغلاق modals عند النقر خارجها
+        window.onclick = function(event) {
+            const closeInquiryModal = document.getElementById('inquiryModal');
+            const closeResponseModal = document.getElementById('responseModal');
+            if (event.target === closeInquiryModal) {
+                closeModal();
+            }
+            if (event.target === closeResponseModal) {
+                closeResponseModal();
+            }
+        }
+
+        // تعيين قيم الفلاتر من URL عند تحميل الصفحة
+        function setFilterValues() {
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            if (urlParams.get('status')) {
+                document.getElementById('statusFilter').value = urlParams.get('status');
+            }
+            if (urlParams.get('type')) {
+                document.getElementById('typeFilter').value = urlParams.get('type');
+            }
+            if (urlParams.get('user_type')) {
+                document.getElementById('userTypeFilter').value = urlParams.get('user_type');
+            }
+            if (urlParams.get('grade')) {
+                document.getElementById('gradeFilter').value = urlParams.get('grade');
+            }
+            if (urlParams.get('section')) {
+                document.getElementById('sectionFilter').value = urlParams.get('section');
+            }
+            if (urlParams.get('search')) {
+                document.getElementById('searchInput').value = urlParams.get('search');
+            }
+        }
+
+        // تشغيل تعيين القيم عند تحميل الصفحة
+        setFilterValues();
+
+        // تحسين رسالة تأكيد حذف الكل
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listeners for inquiry buttons
+            const viewButtons = document.querySelectorAll('.view-inquiry-btn');
+            viewButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const inquiryId = this.getAttribute('data-inquiry-id');
+                    viewInquiry(inquiryId);
+                });
+            });
+
+            const respondButtons = document.querySelectorAll('.respond-inquiry-btn');
+            respondButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const inquiryId = this.getAttribute('data-inquiry-id');
+                    respondToInquiry(inquiryId);
+                });
+            });
+
+            const deleteAllForm = document.querySelector('form[action="/admin/inquiries/delete_all"]');
+            if (deleteAllForm) {
+                deleteAllForm.addEventListener('submit', function(e) {
+                    const inquiryCount = document.querySelectorAll('tbody tr').length;
+                    if (inquiryCount === 0) {
+                        e.preventDefault();
+                        alert('لا توجد استفسارات لحذفها');
+                        return false;
+                    }
+                    
+                    const confirmed = confirm(`هل أنت متأكد من حذف جميع الاستفسارات والشكاوى (${inquiryCount} استفسار)؟\n\n⚠️ تحذير: هذا الإجراء لا يمكن التراجع عنه!\n\nسيتم حذف جميع الاستفسارات والردود المرتبطة.`);
+                    if (!confirmed) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+            }
+        });
+
+        // دالة مسح جميع الفلاتر
+        function clearAllFilters() {
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('typeFilter').value = '';
+            document.getElementById('userTypeFilter').value = '';
+            document.getElementById('gradeFilter').value = '';
+            document.getElementById('sectionFilter').value = '';
+            document.getElementById('searchInput').value = '';
+            
+            // الانتقال إلى الصفحة بدون فلاتر
+            window.location.href = window.location.pathname;
+        }
+
+        // الفلاتر
+        document.getElementById('statusFilter').addEventListener('change', filterInquiries);
+        document.getElementById('typeFilter').addEventListener('change', filterInquiries);
+        document.getElementById('userTypeFilter').addEventListener('change', filterInquiries);
+        document.getElementById('gradeFilter').addEventListener('change', filterInquiries);
+        document.getElementById('sectionFilter').addEventListener('change', filterInquiries);
+        document.getElementById('searchInput').addEventListener('input', filterInquiries);
+
+        function filterInquiries() {
+            const status = document.getElementById('statusFilter').value;
+            const type = document.getElementById('typeFilter').value;
+            const userType = document.getElementById('userTypeFilter').value;
+            const grade = document.getElementById('gradeFilter').value;
+            const section = document.getElementById('sectionFilter').value;
+            const search = document.getElementById('searchInput').value;
+
+            const url = new URL(window.location);
+            
+            // إزالة جميع المعاملات أولاً
+            url.searchParams.delete('status');
+            url.searchParams.delete('type');
+            url.searchParams.delete('user_type');
+            url.searchParams.delete('grade');
+            url.searchParams.delete('section');
+            url.searchParams.delete('search');
+            url.searchParams.delete('page'); // إزالة رقم الصفحة عند الفلترة
+            
+            // إضافة المعاملات الجديدة فقط إذا كانت لها قيمة
+            if (status && status !== '') url.searchParams.set('status', status);
+            if (type && type !== '') url.searchParams.set('type', type);
+            if (userType && userType !== '') url.searchParams.set('user_type', userType);
+            if (grade && grade !== '') url.searchParams.set('grade', grade);
+            if (section && section !== '') url.searchParams.set('section', section);
+            if (search && search.trim() !== '') url.searchParams.set('search', search.trim());
+
+            window.location.href = url.toString();
+        }
+
+        // Mobile menu toggle function
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu) {
+                mobileMenu.classList.toggle('hidden');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Handle outside clicks to close mobile menu
+            document.addEventListener('click', function(e) {
+                const mobileMenu = document.getElementById('mobile-menu');
+                const mobileMenuButton = document.querySelector('[onclick="toggleMobileMenu()"]');
+                
+                if (mobileMenu && !mobileMenu.contains(e.target) && !mobileMenuButton.contains(e.target)) {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+
+            // Handle ESC key to close mobile menu
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    const mobileMenu = document.getElementById('mobile-menu');
+                    if (mobileMenu) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                }
+            });
+
+            // Typing effect
+            const typingText = document.querySelector('.typing-text');
+            if (typingText) {
+                const text = typingText.textContent;
+                typingText.textContent = '';
+                
+                let i = 0;
+                const typeWriter = () => {
+                    if (i < text.length) {
+                        typingText.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, 100);
+                    }
+                };
+                typeWriter();
+            }
+
+            // Button hover effects
+            const ctaButton = document.querySelector('.cta-button');
+            if (ctaButton) {
+                ctaButton.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-4px) scale(1.05)';
+                });
+                
+                ctaButton.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            }
+        });
+    </script>
+</body>
+</html> 

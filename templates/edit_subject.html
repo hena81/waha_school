@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تعديل مادة تعليمية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="font-['Cairo'] bg-gradient-to-br from-blue-50 to-green-100 min-h-screen">
+    <header class="bg-white text-gray-800 shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-32 md:h-36 lg:h-40">
+                <div class="flex items-center flex-shrink-0">
+                    {% if school_settings and school_settings.school_logo %}
+                <img src="/assets/images/{{ school_settings.school_logo }}" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto">
+            {% else %}
+                {% if school_settings and school_settings.school_logo %}
+                    <img src="/assets/images/{{ school_settings.school_logo }}" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto">
+                {% else %}
+                    <img src="/assets/images/logo.png" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto">
+                {% endif %}
+            {% endif %}
+                </div>
+                <div class="flex-1 flex justify-center">
+                    <span class="text-base md:text-3xl font-extrabold text-yellow-400 tracking-wide font-['Cairo','Noto Kufi Arabic',sans-serif] select-none">
+                        {% if school_settings and school_settings.school_name %}
+                            {{ school_settings.school_name }}
+                        {% else %}
+                            سجل بيانات المدرسة من الاعدادات
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    <a href="/admin/subjects" class="px-4 py-2 rounded-md text-base font-medium text-white bg-blue-600 hover:bg-blue-700 transition">العودة للمواد</a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <div class="container mx-auto px-4 py-8">
+        <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">تعديل مادة تعليمية</h2>
+        <form method="POST" class="bg-white rounded-lg shadow-md p-6 max-w-md mx-auto grid grid-cols-1 gap-4">
+            <select name="stage" required class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-lime-200 w-full">
+                <option value="" disabled>المرحلة</option>
+                <option value="10" {% if subject.stage == '10' %}selected{% endif %}>10</option>
+                <option value="11 أدبي" {% if subject.stage == '11 أدبي' %}selected{% endif %}>11 أدبي</option>
+                <option value="11 علمي" {% if subject.stage == '11 علمي' %}selected{% endif %}>11 علمي</option>
+                <option value="12 أدبي" {% if subject.stage == '12 أدبي' %}selected{% endif %}>12 أدبي</option>
+                <option value="12 علمي" {% if subject.stage == '12 علمي' %}selected{% endif %}>12 علمي</option>
+            </select>
+            <input name="subject" type="text" required placeholder="اسم المادة" value="{{ subject.subject }}" class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-lime-200 w-full">
+            <button type="submit" class="bg-lime-600 text-white rounded py-2 mt-2 hover:bg-lime-700 transition w-full">حفظ التعديلات</button>
+            <a href="/admin/subjects" class="text-center mt-2 text-blue-700 hover:underline">إلغاء</a>
+        </form>
+    </div>
+</body>
+</html> 

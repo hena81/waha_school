@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة أخبار المدرسة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Quill.js CSS -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <style>
+        /* Typing effect */
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+
+        .typing-text {
+            border-right: 3px solid #fbbf24;
+            white-space: nowrap;
+        }
+
+        /* CTA Button */
+        .cta-button {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .cta-button:active {
+            transform: translateY(0);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .cta-button:focus {
+            outline: 2px solid #f59e0b;
+            outline-offset: 2px;
+        }
+
+        .cta-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .cta-button:focus-visible {
+            outline: 3px solid #f59e0b;
+            outline-offset: 3px;
+        }
+
+        .cta-button:focus-within {
+            outline: 3px solid #f59e0b;
+            outline-offset: 3px;
+        }
+
+        .cta-button:focus-visible:focus-within {
+            outline: 3px solid #f59e0b;
+            outline-offset: 3px;
+        }
+
+        .cta-button:focus-visible:focus-within:active {
+            outline: 3px solid #f59e0b;
+            outline-offset: 3px;
+            transform: scale(0.95);
+        }
+
+        .cta-button:focus-visible:focus-within:active:hover {
+            outline: 3px solid #f59e0b;
+            outline-offset: 3px;
+            transform: scale(0.95);
+        }
+
+        .cta-button:focus-visible:focus-within:active:hover:focus {
+            outline: 3px solid #f59e0b;
+            outline-offset: 3px;
+            transform: scale(0.95);
+        }
+
+        .cta-button:focus-visible:focus-within:active:hover:focus:active {
+            outline: 3px solid #f59e0b;
+            outline-offset: 3px;
+            transform: scale(0.95);
+        }
+
+        .cta-button:focus-visible:focus-within:active:hover:focus:active:hover {
+            outline: 3px solid #f59e0b;
+            outline-offset: 3px;
+            transform: scale(0.95);
+        }
+
+        .cta-button:focus-visible:focus-within:active:hover:focus:active:hover:focus {
+            outline: 3px solid #f59e0b;
+            outline-offset: 3px;
+            transform: scale(0.95);
+        }
+
+        .cta-button:focus-visible:focus-within:active:hover:focus:active:hover:focus:active {
+            outline: 3px solid #f59e0b;
+            outline-offset: 3px;
+            transform: scale(0.95);
+        }
+
+        .cta-button:focus-visible:focus-within:active:hover:focus:active:hover:focus:active:hover {
+            outline: 3px solid #f59e0b;
+            outline-offset: 3px;
+            transform: scale(0.95);
+        }
+
+        /* تحسين للزر ليكون خارج منطقة المحرر */
+        #add-news-btn {
+            pointer-events: auto !important;
+            position: relative !important;
+            z-index: 9999 !important;
+        }
+
+        #add-news-btn * {
+            pointer-events: auto !important;
+        }
+
+        /* تحسين لمنطقة الزر */
+        .flex.justify-center {
+            position: relative !important;
+            z-index: 9999 !important;
+            pointer-events: auto !important;
+        }
+
+        .flex.justify-center * {
+            pointer-events: auto !important;
+        }
+
+        /* تحسين لجميع أزرار إضافة الخبر */
+        #add-news-btn, #add-news-btn-top {
+            pointer-events: auto !important;
+            position: relative !important;
+            z-index: 9999 !important;
+            cursor: pointer !important;
+            user-select: none !important;
+        }
+
+        #add-news-btn *, #add-news-btn-top * {
+            pointer-events: auto !important;
+        }
+
+        /* منع تداخل المحرر مع الأزرار */
+        .ql-editor, .ql-toolbar, .ql-container {
+            pointer-events: auto !important;
+        }
+
+        /* تحسين زر الإرسال */
+        #submit-news-btn {
+            pointer-events: auto !important;
+            position: relative !important;
+            z-index: 9999 !important;
+            cursor: pointer !important;
+            user-select: none !important;
+        }
+
+        #submit-news-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        #submit-news-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Glass effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Quill Editor Customization */
+        .ql-editor {
+            direction: rtl;
+            text-align: right;
+            font-family: 'Cairo', sans-serif;
+            min-height: 200px;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .ql-toolbar {
+            direction: rtl;
+            border-radius: 8px 8px 0 0;
+            border-color: #e5e7eb;
+        }
+
+        .ql-container {
+            border-radius: 0 0 8px 8px;
+            border-color: #e5e7eb;
+        }
+
+        .ql-editor.ql-blank::before {
+            color: #9ca3af;
+            font-style: normal;
+            font-family: 'Cairo', sans-serif;
+        }
+
+        /* Custom Quill toolbar buttons */
+        .ql-formats {
+            margin-left: 0;
+            margin-right: 15px;
+        }
+
+        /* Drag & Drop Area */
+        .drag-drop-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            background: #f9fafb;
+        }
+
+        .drag-drop-area.dragover {
+            border-color: #f59e0b;
+            background: #fef3c7;
+        }
+
+        .drag-drop-area.has-files {
+            border-color: #10b981;
+            background: #d1fae5;
+        }
+
+        /* Image preview */
+        .image-preview {
+            max-width: 100px;
+            max-height: 100px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin: 5px;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .typing-text {
+                font-size: 1.5rem;
+                line-height: 2rem;
+            }
+            
+            .ql-toolbar {
+                flex-wrap: wrap;
+            }
+            
+            .ql-formats {
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body class="font-['Cairo'] bg-gradient-to-br from-orange-50 to-yellow-100 min-h-screen">
+    <!-- Header & Hero Section -->
+    <section class="relative bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900 text-white overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 bg-black/20"></div>
+        
+        <!-- Header Navigation -->
+        <div class="relative z-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-32 md:h-36 lg:h-40">
+                    <!-- Right: Logo -->
+                    <div class="flex items-center flex-shrink-0">
+                        {% if school_settings and school_settings.school_logo %}
+                    <img src="/assets/images/{{ school_settings.school_logo }}" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto ">
+                {% else %}
+                    {% if school_settings and school_settings.school_logo %}
+                    <img src="/assets/images/{{ school_settings.school_logo }}" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto ">
+                {% else %}
+                    <img src="/assets/images/logo.png" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto ">
+                {% endif %}
+                {% endif %}
+                    </div>
+                    <!-- Center: School Name (always visible) -->
+                    <div class="flex-1 flex justify-center">
+                                        <span class="text-base md:text-3xl font-extrabold text-yellow-400 tracking-wide font-['Cairo','Noto Kufi Arabic',sans-serif] select-none">
+                    {% if school_settings and school_settings.school_name %}
+                        {{ school_settings.school_name }}
+                    {% else %}
+                        سجل بيانات المدرسة من الاعدادات
+                    {% endif %}
+                </span>
+                    </div>
+                    <!-- Left: Navigation & Hamburger -->
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <!-- Desktop Nav -->
+                        <nav class="hidden md:flex items-center space-x-1 space-x-reverse mr-4">
+                            <a href="/admin" class="px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition">لوحة التحكم</a>
+                            <a href="/logout" class="px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition">تسجيل الخروج</a>
+                        </nav>
+                        <!-- Mobile menu button -->
+                        <button onclick="toggleMobileMenu()" class="md:hidden flex items-center justify-center w-11 h-11 rounded-lg bg-white/10 text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 transition" aria-label="فتح القائمة">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white/10 backdrop-blur-md border-t border-white/10 z-40 relative">
+            <nav class="flex flex-col py-2 px-4 space-y-1">
+                <a href="/admin" class="block px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition">لوحة التحكم</a>
+                <a href="/logout" class="block px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition">تسجيل الخروج</a>
+            </nav>
+        </div>
+
+        <!-- Hero Content -->
+        <div class="relative z-10 pb-32">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+                <div class="text-center">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-6 typing-text mt-16">
+                        إدارة أخبار المدرسة
+                    </h1>
+                    <p class="text-xl md:text-2xl text-white/80 mb-8 max-w-3xl mx-auto mt-8">
+                        إضافة وإدارة الأخبار والإعلانات المدرسية مع محرر نصوص متقدم
+                    </p>
+                    <div class="flex justify-center" style="position: relative; z-index: 9999;">
+                        <button id="add-news-btn" onclick="scrollToForm()" class="cta-button bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer" title="انقر لإضافة خبر جديد" style="position: relative; z-index: 9999;" tabindex="0" role="button" aria-label="إضافة خبر جديد" onkeydown="if(event.key==='Enter'||event.key===' ')scrollToForm()" data-testid="add-news-button" type="button">
+                            <span style="position: relative; z-index: 10000;">➕ إضافة خبر جديد</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- أيقونة الرئيسية -->
+    <div class="fixed left-4 top-1/2 transform -translate-y-1/2 z-50">
+        <a href="/admin" class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl">
+            <i class="fas fa-home text-xl"></i>
+        </a>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <!-- زر إضافة خبر إضافي في أعلى النموذج -->
+        
+        
+        <form id="news-form" method="POST" enctype="multipart/form-data" class="bg-white rounded-lg shadow-md p-6 mb-8 grid grid-cols-1 md:grid-cols-4 gap-4 w-full max-w-4xl mx-auto" style="position: relative; z-index: 1;">
+            <input name="title" type="text" required placeholder="عنوان الخبر" class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-200 col-span-1 md:col-span-2 w-full">
+            <label for="imageInput" class="relative col-span-1 w-full">
+                <input name="image" type="file" accept="image/*" class="sr-only" id="imageInput" onchange="document.getElementById('imageLabelText').textContent = this.files[0] ? this.files[0].name : 'اختر صورة'">
+                <span id="imageLabelText" class="flex items-center justify-center border rounded px-3 py-2 w-full bg-orange-50 text-orange-700 font-bold cursor-pointer hover:bg-orange-100 transition">اختر صورة</span>
+            </label>
+            
+            <!-- Rich Text Editor Container -->
+            <div class="col-span-1 md:col-span-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">تفاصيل الخبر</label>
+                <div id="editor" class="border rounded-lg"></div>
+                <textarea name="details" id="details" style="display: none;"></textarea>
+            </div>
+            
+                         <button type="submit" id="submit-news-btn" class="col-span-1 md:col-span-4 bg-orange-600 text-white rounded py-2 mt-2 hover:bg-orange-700 transition w-full cursor-pointer font-bold text-lg">💾 إضافة خبر</button>
+        </form>
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class="mb-4">
+              {% for category, message in messages %}
+                <li class="text-{{ 'red' if category == 'danger' else 'green' }}-600">{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+        
+        <div class="mb-4 flex flex-col md:flex-row gap-2 justify-between items-center w-full max-w-4xl mx-auto">
+            <input id="filterTitle" type="text" placeholder="ابحث بعنوان الخبر..." class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-200 w-full md:w-64">
+            {% if session.role == 'مشرف' %}
+            <form method="POST" action="/admin/news/delete_all" onsubmit="return confirm('هل أنت متأكد من حذف جميع الأخبار؟ هذا الإجراء لا يمكن التراجع عنه.');" class="flex-shrink-0">
+                <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition font-bold">
+                    حذف الكل
+                </button>
+            </form>
+            {% endif %}
+        </div>
+        
+        <div class="overflow-x-auto w-full max-w-4xl mx-auto">
+            <table class="min-w-full bg-white rounded-lg shadow-md text-sm md:text-base">
+                <thead>
+                    <tr>
+                        <th class="py-2 px-2 md:px-4">#</th>
+                        <th class="py-2 px-2 md:px-4">العنوان</th>
+                        <th class="py-2 px-2 md:px-4">التفاصيل</th>
+                        <th class="py-2 px-2 md:px-4">الصورة</th>
+                        <th class="py-2 px-2 md:px-4">التاريخ</th>
+                        <th class="py-2 px-2 md:px-4">تعديل</th>
+                        <th class="py-2 px-2 md:px-4">حذف</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for news in news_list %}
+                    <tr class="border-b hover:bg-orange-50">
+                        <td class="py-2 px-2 md:px-4">{{ loop.index }}</td>
+                        <td class="py-2 px-2 md:px-4 font-bold">{{ news.title }}</td>
+                        <td class="py-2 px-2 md:px-4">
+                            <div class="max-h-20 overflow-hidden">
+                                {{ news.details|striptags|truncate(100) }}
+                            </div>
+                        </td>
+                        <td class="py-2 px-2 md:px-4">
+                            {% if news.image %}
+                                <img src="/assets/images/news/{{ news.image }}" alt="صورة الخبر" class="h-16 w-16 object-cover rounded shadow mx-auto">
+                            {% else %}-{% endif %}
+                        </td>
+                        <td class="py-2 px-2 md:px-4">{{ news.date }}</td>
+                        <td class="py-2 px-2 md:px-4">
+                            <a href="/admin/news/edit/{{ news.id }}" class="text-blue-600 hover:underline font-bold">تعديل</a>
+                        </td>
+                        <td class="py-2 px-2 md:px-4">
+                            {% if session.role == 'مشرف' or session.role == 'مشرف محتوى' %}
+                            <form method="POST" action="/admin/news/delete/{{ news.id }}" onsubmit="return confirm('هل أنت متأكد من حذف هذا الخبر؟');">
+                                <button type="submit" class="text-red-600 hover:underline font-bold">حذف</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Quill.js Script -->
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <script>
+        // تهيئة محرر Quill
+        var quill = new Quill('#editor', {
+            theme: 'snow',
+            direction: 'rtl',
+            placeholder: 'اكتب تفاصيل الخبر هنا...',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'align': [] }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
+            },
+            formats: [
+                'header', 'bold', 'italic', 'underline', 'strike',
+                'color', 'background', 'list', 'bullet', 'align',
+                'link', 'image', 'clean'
+            ]
+        });
+
+        // إعداد رفع الصور
+        var toolbar = quill.getModule('toolbar');
+        toolbar.addHandler('image', function() {
+            var input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', 'image/*');
+            input.click();
+
+            input.onchange = function() {
+                var file = input.files[0];
+                if (file) {
+                    var formData = new FormData();
+                    formData.append('image', file);
+
+                    fetch('/api/upload_editor_image', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            var range = quill.getSelection();
+                            quill.insertEmbed(range.index, 'image', data.url);
+                        } else {
+                            alert('خطأ في رفع الصورة: ' + data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('خطأ في رفع الصورة');
+                    });
+                }
+            };
+        });
+
+        // تحديث textarea قبل إرسال النموذج
+        document.querySelector('form').addEventListener('submit', function(e) {
+            console.log('Form submit event triggered');
+            var html = quill.root.innerHTML;
+            document.getElementById('details').value = html;
+            console.log('HTML content updated:', html);
+        });
+
+        // إضافة event listener لزر الإرسال
+        document.addEventListener('DOMContentLoaded', function() {
+            const submitBtn = document.getElementById('submit-news-btn');
+            if (submitBtn) {
+                console.log('Submit button found');
+                submitBtn.addEventListener('click', function(e) {
+                    console.log('Submit button clicked');
+                    
+                    // إضافة تأثير بصري عند النقر
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                    
+                    // التأكد من تحديث المحتوى
+                    var html = quill.root.innerHTML;
+                    document.getElementById('details').value = html;
+                    console.log('Form content updated before submit');
+                });
+            } else {
+                console.log('Submit button not found');
+            }
+        });
+
+        // فلترة الأخبار بالعنوان
+        function normalizeArabic(str) {
+            return str.replace(/[\u064B-\u0652]/g, '').replace(/\s+/g, '').replace(/[أإآا]/g, 'ا').replace(/[ة]/g, 'ه').replace(/[ى]/g, 'ي').toLowerCase();
+        }
+        
+        document.getElementById('filterTitle').addEventListener('input', function() {
+            var filter = normalizeArabic(this.value.trim());
+            var table = document.querySelector('table');
+            var trs = table.getElementsByTagName('tr');
+            for (var i = 2; i < trs.length; i++) { // نبدأ من 2 لتخطي رأس الجدول
+                var titleTd = trs[i].getElementsByTagName('td')[1];
+                if (titleTd) {
+                    var title = normalizeArabic(titleTd.textContent || titleTd.innerText);
+                    trs[i].style.display = title.includes(filter) ? '' : 'none';
+                }
+            }
+        });
+
+        // تحسين رسالة تأكيد حذف الكل
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteAllForms = document.querySelectorAll('form[action="/admin/news/delete_all"]');
+            deleteAllForms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    const newsCount = document.querySelectorAll('tbody tr').length;
+                    if (newsCount === 0) {
+                        e.preventDefault();
+                        alert('لا توجد أخبار لحذفها');
+                        return false;
+                    }
+                    
+                    const confirmed = confirm(`هل أنت متأكد من حذف جميع الأخبار (${newsCount} خبر)؟\n\n⚠️ تحذير: هذا الإجراء لا يمكن التراجع عنه!`);
+                    if (!confirmed) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+            });
+        });
+
+        // دالة تمرير الصفحة إلى نموذج إضافة الخبر - متاحة عالمياً
+        window.scrollToForm = function() {
+            console.log('scrollToForm function called');
+            const form = document.getElementById('news-form');
+            if (form) {
+                console.log('Form found, scrolling to it');
+                form.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+                // إضافة تأثير بصري للنموذج
+                form.style.boxShadow = '0 0 20px rgba(251, 191, 36, 0.5)';
+                setTimeout(() => {
+                    form.style.boxShadow = '';
+                }, 2000);
+                
+                // إضافة رسالة تأكيد
+                console.log('تم تمرير الصفحة إلى نموذج إضافة الخبر');
+            } else {
+                console.log('Form not found');
+                alert('لم يتم العثور على نموذج إضافة الخبر');
+            }
+        }
+    </script>
+    
+    <script>
+        // Mobile menu toggle function
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu) {
+                mobileMenu.classList.toggle('hidden');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Handle outside clicks to close mobile menu
+            document.addEventListener('click', function(e) {
+                const mobileMenu = document.getElementById('mobile-menu');
+                const mobileMenuButton = document.querySelector('[onclick="toggleMobileMenu()"]');
+                
+                if (mobileMenu && !mobileMenu.contains(e.target) && !mobileMenuButton.contains(e.target)) {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+
+            // Handle ESC key to close mobile menu
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    const mobileMenu = document.getElementById('mobile-menu');
+                    if (mobileMenu) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                }
+            });
+
+            // Typing effect
+            const typingText = document.querySelector('.typing-text');
+            if (typingText) {
+                const text = typingText.textContent;
+                typingText.textContent = '';
+                
+                let i = 0;
+                const typeWriter = () => {
+                    if (i < text.length) {
+                        typingText.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, 100);
+                    }
+                };
+                typeWriter();
+            }
+
+            // Button hover effects
+            const ctaButton = document.querySelector('.cta-button');
+            if (ctaButton) {
+                ctaButton.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-4px) scale(1.05)';
+                });
+                
+                ctaButton.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+
+                // إضافة event listener للزر للتأكد من عمله
+                ctaButton.addEventListener('click', function(e) {
+                    console.log('CTA button clicked');
+                    e.preventDefault();
+                    window.scrollToForm();
+                });
+
+                // إضافة event listener إضافي للزر باستخدام ID
+                const addNewsBtn = document.getElementById('add-news-btn');
+                if (addNewsBtn) {
+                    addNewsBtn.addEventListener('click', function(e) {
+                        console.log('Add news button clicked via ID');
+                        e.preventDefault();
+                        
+                        // إضافة تأثير بصري عند النقر
+                        this.style.transform = 'scale(0.95)';
+                        setTimeout(() => {
+                            this.style.transform = '';
+                        }, 150);
+                        
+                        // إضافة تأثير صوتي (إذا كان متاحاً)
+                        try {
+                            const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT');
+                            audio.volume = 0.1;
+                            audio.play();
+                        } catch (e) {
+                            // تجاهل خطأ الصوت
+                        }
+                        
+                        window.scrollToForm();
+                    });
+                }
+            }
+        });
+    </script>
+    
+    <!-- إضافة دالة بسيطة لزر إضافة الخبر -->
+    <script>
+        // دالة تمرير الصفحة إلى نموذج إضافة الخبر
+        function scrollToForm() {
+            console.log('تم النقر على زر إضافة خبر جديد');
+            const form = document.getElementById('news-form');
+            if (form) {
+                console.log('تم العثور على النموذج، جاري التمرير...');
+                form.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'start' 
+                });
+                // إضافة تأثير بصري للنموذج
+                form.style.boxShadow = '0 0 20px rgba(251, 191, 36, 0.5)';
+                setTimeout(() => {
+                    form.style.boxShadow = '';
+                }, 2000);
+                console.log('تم تمرير الصفحة بنجاح');
+                
+                // إضافة رسالة تأكيد
+                setTimeout(() => {
+                    console.log('تم تمرير الصفحة إلى نموذج إضافة الخبر بنجاح');
+                }, 1000);
+            } else {
+                console.log('لم يتم العثور على النموذج');
+                alert('لم يتم العثور على نموذج إضافة الخبر');
+            }
+        }
+
+        // إضافة event listener للزر عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            // زر إضافة الخبر في Hero
+            const addNewsBtn = document.getElementById('add-news-btn');
+            if (addNewsBtn) {
+                console.log('تم العثور على زر إضافة الخبر في Hero');
+                addNewsBtn.addEventListener('click', function(e) {
+                    console.log('تم النقر على الزر عبر event listener');
+                    e.preventDefault();
+                    
+                    // إضافة تأثير بصري عند النقر
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                    
+                    // إضافة تأثير صوتي (إذا كان متاحاً)
+                    try {
+                        const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT');
+                        audio.volume = 0.1;
+                        audio.play();
+                    } catch (e) {
+                        // تجاهل خطأ الصوت
+                    }
+                    
+                    scrollToForm();
+                });
+            } else {
+                console.log('لم يتم العثور على زر إضافة الخبر في Hero');
+            }
+            
+            // زر إضافة الخبر في أعلى النموذج
+            const addNewsBtnTop = document.getElementById('add-news-btn-top');
+            if (addNewsBtnTop) {
+                console.log('تم العثور على زر إضافة الخبر في أعلى النموذج');
+                addNewsBtnTop.addEventListener('click', function(e) {
+                    console.log('تم النقر على الزر في أعلى النموذج عبر event listener');
+                    e.preventDefault();
+                    
+                    // إضافة تأثير بصري عند النقر
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                    
+                    // إضافة تأثير صوتي (إذا كان متاحاً)
+                    try {
+                        const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIG2m98OScTgwOUarm7blmGgU7k9n1unEiBC13yO/eizEIHWq+8+OWT');
+                        audio.volume = 0.1;
+                        audio.play();
+                    } catch (e) {
+                        // تجاهل خطأ الصوت
+                    }
+                    
+                    scrollToForm();
+                });
+            } else {
+                console.log('لم يتم العثور على زر إضافة الخبر في أعلى النموذج');
+            }
+        });
+    </script>
+</body>
+</html> 

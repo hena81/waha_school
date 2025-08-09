@@ -1,0 +1,988 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>معرض الأنشطة المدرسية</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Lightbox CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet">
+    <!-- Video.js CSS -->
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet">
+    <style>
+        /* Custom Animations and Effects */
+        @keyframes fade-in-up {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in-up {
+            animation: fade-in-up 1s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .animation-delay-100 { animation-delay: 0.1s; }
+        .animation-delay-200 { animation-delay: 0.2s; }
+        .animation-delay-300 { animation-delay: 0.3s; }
+        .animation-delay-400 { animation-delay: 0.4s; }
+        .animation-delay-500 { animation-delay: 0.5s; }
+        .animation-delay-600 { animation-delay: 0.6s; }
+        .animation-delay-700 { animation-delay: 0.7s; }
+        .animation-delay-800 { animation-delay: 0.8s; }
+        .animation-delay-1000 { animation-delay: 1s; }
+        
+        /* Additional Animation Delays */
+        .delay-1000 { animation-delay: 1s; }
+        .delay-2000 { animation-delay: 2s; }
+        .delay-3000 { animation-delay: 3s; }
+        
+        /* Activity Card Hover Effects */
+        .activity-card {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            min-height: 480px;
+            max-height: 580px;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        .activity-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        /* Image Zoom Effect */
+        .activity-image {
+            transition: transform 0.5s ease;
+        }
+        
+        .activity-card:hover .activity-image {
+            transform: scale(1.1);
+        }
+        
+        /* Badge Animations */
+        .activity-badge {
+            transition: all 0.3s ease;
+        }
+        
+        .activity-badge:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Button Hover Effects */
+        .activity-button {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .activity-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5);
+        }
+        
+        /* Fix for Arabic Text Clipping */
+        .overflow-visible {
+            overflow: visible !important;
+        }
+        
+        /* Enhanced Arabic Typography */
+        h1, h2, h3, h4, h5, h6 {
+            line-height: 1.4 !important;
+            padding: 0.1em 0 !important;
+        }
+        
+        /* Ensure Arabic text displays properly */
+        .arabic-text {
+            text-rendering: optimizeLegibility;
+            font-feature-settings: "liga" 1, "kern" 1;
+        }
+
+        /* Typing Effect */
+        @keyframes typing {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+        
+        @keyframes blink {
+            0%, 50% { border-color: transparent; }
+            51%, 100% { border-color: white; }
+        }
+        
+        .typing-text {
+            display: inline-block;
+            overflow: visible;
+            white-space: nowrap;
+            border-right: 3px solid white;
+            animation: typing 3s steps(40, end), blink 0.75s step-end infinite;
+            line-height: 1.2;
+            padding: 0.1em 0;
+        }
+
+        /* Enhanced Button Styles */
+        .cta-button {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        /* Enhanced Hover Effects */
+        .hover-glow:hover {
+            box-shadow: 0 0 30px rgba(255, 193, 7, 0.5);
+        }
+        
+        /* Glass Morphism Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .typing-text {
+                animation: none;
+                border-right: none;
+            }
+        }
+
+        /* Line Clamp Utility */
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .share-button {
+            transition: all 0.2s ease;
+        }
+        
+        .share-button:hover {
+            transform: scale(1.1);
+        }
+
+        .share-dropdown {
+            transition: all 0.3s ease;
+            transform-origin: top right;
+        }
+
+        .share-dropdown.hidden {
+            transform: scale(0.95);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .share-dropdown:not(.hidden) {
+            transform: scale(1);
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="font-['Cairo'] bg-gray-50">
+    <!-- Combined Header and Hero Section -->
+    <section class="relative bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 overflow-hidden">
+        <!-- Static Gradient Background -->
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900"></div>
+        
+        <!-- Overlay for Text Clarity -->
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
+        
+        <!-- Header Navigation -->
+        <div class="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-32 md:h-36 lg:h-40">
+                <!-- Right: Logo -->
+                <div class="flex items-center flex-shrink-0">
+                    {% if school_settings and school_settings.school_logo %}
+                    <img src="/assets/images/{{ school_settings.school_logo }}" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto drop-shadow-lg ">
+                {% else %}
+                    {% if school_settings and school_settings.school_logo %}
+                    <img src="/assets/images/{{ school_settings.school_logo }}" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto drop-shadow-lg ">
+                {% else %}
+                    <img src="/assets/images/logo.png" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto drop-shadow-lg ">
+                {% endif %}
+                {% endif %}
+                </div>
+                <!-- Center: School Name (always visible) -->
+                <div class="flex-1 flex justify-center">
+                                                            <span class="text-base md:text-3xl font-extrabold text-yellow-400 tracking-wide font-['Cairo','Noto Kufi Arabic',sans-serif] select-none">
+                    {% if school_settings and school_settings.school_name %}
+                        {{ school_settings.school_name }}
+                    {% else %}
+                        سجل بيانات المدرسة من الاعدادات
+                    {% endif %}
+                </span>
+                </div>
+                <!-- Left: Navigation & Hamburger -->
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    <!-- Desktop Nav -->
+                    <nav class="hidden md:flex items-center space-x-1 space-x-reverse mr-4">
+                        <a href="/" class="px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">الرئيسية</a>
+                    </nav>
+                    <!-- Mobile menu button -->
+                    <button id="mobile-menu-button" onclick="toggleMobileMenu()" class="md:hidden flex items-center justify-center w-11 h-11 rounded-lg bg-white/10 text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-yellow-300 transition-all duration-300 cursor-pointer" aria-label="فتح القائمة" type="button">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu" class="hidden md:hidden bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900/95 backdrop-blur-sm border-t border-white/10 z-40 relative">
+            <nav class="flex flex-col py-2 px-4 space-y-1">
+                <a href="/" class="block px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">الرئيسية</a>
+            </nav>
+        </div>
+        
+        <!-- Hero Content -->
+        <div class="relative z-10 container mx-auto px-6 flex flex-col justify-center items-center text-center pb-32">
+            <!-- Main Title with Typing Effect -->
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-8 text-white drop-shadow-2xl leading-relaxed animate-fade-in-up animation-delay-200 overflow-visible mt-16">
+                <span class="typing-text">معرض الأنشطة المدرسية</span>
+            </h1>
+            
+            <!-- Subtitle -->
+            <p class="text-xl md:text-2xl lg:text-3xl mb-8 max-w-4xl text-white/90 drop-shadow-lg leading-relaxed animate-fade-in-up animation-delay-400">
+                استكشف الفعاليات والأنشطة المدرسية من خلال الصور ومقاطع الفيديو
+            </p>
+            
+            <!-- Call to Action Button -->
+            <div class="animate-fade-in-up animation-delay-800 mt-8">
+                <a href="#activities-content" class="cta-button group relative inline-flex items-center px-12 py-4 text-xl font-bold text-white bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-full shadow-2xl hover:shadow-yellow-500/25 transition-all duration-500 transform hover:scale-105 hover:-translate-y-1 hover-glow">
+                    <span class="relative z-10">استكشف الأنشطة</span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-yellow-600 to-yellow-700 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <svg class="w-6 h-6 mr-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <main>
+
+        <!-- Activities Content Section -->
+        <section id="activities-content" class="pt-8 pb-20 bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 relative overflow-hidden">
+            <!-- Background Pattern -->
+            <div class="absolute inset-0 opacity-5">
+                <div class="absolute top-20 left-10 w-32 h-32 bg-blue-400 rounded-full blur-3xl"></div>
+                <div class="absolute bottom-20 right-10 w-40 h-40 bg-purple-400 rounded-full blur-3xl"></div>
+                <div class="absolute top-1/2 left-1/2 w-24 h-24 bg-green-400 rounded-full blur-2xl"></div>
+            </div>
+            
+            <div class="container mx-auto px-6 relative z-10">
+                
+                <!-- Activities Grid -->
+                <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-8 mb-12">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">الأنشطة ({{ activities|length }} نشاط)</h3>
+                    
+                    {% if activities %}
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 items-stretch">
+                        {% for activity in activities %}
+                        <div class="group relative animate-fade-in-up animation-delay-{{ loop.index * 100 }} h-full">
+                            <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 overflow-hidden h-full flex flex-col">
+                                <!-- Activity Image/Video -->
+                                <div class="relative overflow-hidden h-48">
+                                    {% if activity.media %}
+                                        {% set primary_media = activity.media|selectattr('is_primary', 'equalto', true)|first %}
+                                        {% if not primary_media %}
+                                            {% set primary_media = activity.media|first %}
+                                        {% endif %}
+                                        
+                                        {% if primary_media.media_type == 'صورة' %}
+                                        <a href="/assets/activities/{{ primary_media.file_path }}" data-lightbox="activities" data-title="{{ activity.name }}" class="block w-full h-full">
+                                            <img src="/assets/activities/{{ primary_media.file_path }}" alt="{{ activity.name }}" class="w-full h-full object-cover activity-image">
+                                        </a>
+                                        {% else %}
+                                        {% if primary_media.thumbnail_path %}
+                                        <img src="/assets/activities/{{ primary_media.thumbnail_path }}" alt="{{ activity.name }}" class="w-full h-full object-cover activity-image">
+                                        {% else %}
+                                        <div class="w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
+                                            <svg class="w-16 h-16 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                                                <path d="M8 5v14l11-7z"/>
+                                            </svg>
+                                        </div>
+                                        {% endif %}
+                                        <button data-video-path="{{ primary_media.file_path }}" data-video-title="{{ activity.name }}" onclick="playVideoFromData(this)" class="absolute inset-0 w-full h-full">
+                                            <!-- Video will play directly -->
+                                        </button>
+                                        {% endif %}
+                                        
+                                        <!-- عدد الوسائط الإضافية -->
+                                        {% if activity.media|length > 1 %}
+                                        <div class="absolute top-4 right-4 bg-black/75 text-white px-2 py-1 rounded-full text-xs font-medium">
+                                            +{{ activity.media|length - 1 }}
+                                        </div>
+                                        {% endif %}
+                                    {% else %}
+                                    <div class="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                                        <svg class="w-16 h-16 text-gray-400" fill="currentColor" viewBox="0 0 24 24">
+                                            <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z"/>
+                                        </svg>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <!-- Gradient Overlay -->
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                                    
+                                    <!-- Media Type Badge -->
+                                    {% if activity.media %}
+                                    <div class="absolute top-4 left-4">
+                                        <div class="bg-white/90 backdrop-blur-sm text-gray-800 px-3 py-1 rounded-full text-sm font-medium shadow-lg activity-badge">
+                                            {% set image_count = activity.media|selectattr('media_type', 'equalto', 'صورة')|list|length %}
+                                            {% set video_count = activity.media|selectattr('media_type', 'equalto', 'فيديو')|list|length %}
+                                            {% if image_count > 0 and video_count > 0 %}
+                                                📷 {{ image_count }} 🎥 {{ video_count }}
+                                            {% elif image_count > 0 %}
+                                                📷 {{ image_count }} صور
+                                            {% elif video_count > 0 %}
+                                                🎥 {{ video_count }} فيديو
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+
+                                    <!-- Share Button -->
+                                    <div class="absolute top-4 left-4 relative">
+                                        <button onclick="toggleShareDropdown('{{ loop.index }}')" class="bg-white/90 backdrop-blur-sm hover:bg-white text-gray-700 p-2 rounded-full shadow-lg share-button">
+                                            <i class="fas fa-share-alt text-sm"></i>
+                                        </button>
+                                        
+                                        <!-- Share Dropdown -->
+                                        <div id="shareDropdown{{ loop.index }}" class="share-dropdown hidden absolute top-full left-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 z-10 min-w-48">
+                                            <div class="p-2">
+                                                <div class="text-xs text-gray-500 mb-2 px-2">مشاركة النشاط</div>
+                                                <div class="space-y-1">
+                                                    <button onclick="shareOnWhatsApp('{{ activity.name }}', '{{ activity.description[:100] }}', '{{ request.host_url }}activities')" class="w-full text-right px-3 py-2 text-sm hover:bg-green-50 rounded-md transition-colors flex items-center">
+                                                        <i class="fab fa-whatsapp text-green-500 ml-2"></i>
+                                                        واتساب
+                                                    </button>
+                                                    <button onclick="shareOnFacebook('{{ activity.name }}', '{{ request.host_url }}activities')" class="w-full text-right px-3 py-2 text-sm hover:bg-blue-50 rounded-md transition-colors flex items-center">
+                                                        <i class="fab fa-facebook text-blue-600 ml-2"></i>
+                                                        فيسبوك
+                                                    </button>
+                                                    <button onclick="shareOnTwitter('{{ activity.name }}', '{{ request.host_url }}activities')" class="w-full text-right px-3 py-2 text-sm hover:bg-blue-50 rounded-md transition-colors flex items-center">
+                                                        <i class="fab fa-twitter text-blue-400 ml-2"></i>
+                                                        تويتر
+                                                    </button>
+                                                    <button onclick="shareOnTelegram('{{ activity.name }}', '{{ request.host_url }}activities')" class="w-full text-right px-3 py-2 text-sm hover:bg-blue-50 rounded-md transition-colors flex items-center">
+                                                        <i class="fab fa-telegram text-blue-500 ml-2"></i>
+                                                        تليجرام
+                                                    </button>
+                                                    <button onclick="copyLink('{{ request.host_url }}activities')" class="w-full text-right px-3 py-2 text-sm hover:bg-gray-50 rounded-md transition-colors flex items-center">
+                                                        <i class="fas fa-link text-gray-500 ml-2"></i>
+                                                        نسخ الرابط
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Activity Content -->
+                                <div class="p-6 flex-1 flex flex-col relative">
+                                    <!-- Activity Title -->
+                                    <h3 class="text-xl font-bold text-gray-800 mb-3 group-hover:text-blue-600 transition-colors duration-300 leading-relaxed overflow-visible">
+                                        {{ activity.name }}
+                                    </h3>
+                                    
+                                    <!-- Activity Description -->
+                                    <p class="text-gray-600 leading-relaxed mb-4 text-right flex-1 min-h-[4rem] max-h-[4.5rem] overflow-hidden line-clamp-3 flex-grow text-sm leading-6 px-2">
+                                        {{ activity.description[:120] }}{% if activity.description|length > 120 %}...{% endif %}
+                                    </p>
+                                    
+                                    <!-- Activity Date - Fixed Position -->
+                                    <div class="flex items-center justify-between text-sm text-gray-500 mb-4 flex-shrink-0">
+                                        <span>{{ activity.activity_date.strftime('%Y-%m-%d') }}</span>
+                                        <span>{{ activity.upload_date.strftime('%H:%M') }}</span>
+                                    </div>
+                                    
+                                    <!-- Spacer for buttons -->
+                                    <div class="h-12 flex-shrink-0"></div>
+                                    
+                                    <!-- View Buttons -->
+                                    <div class="text-center space-y-2 mt-auto pt-4 flex-shrink-0 h-16 flex items-center justify-center w-full absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm rounded-b-2xl z-20 border-t border-gray-100 shadow-lg transform translate-y-0 mb-0" style="bottom: 4px; left: 8px; right: 8px; width: calc(100% - 16px); pointer-events: auto;">
+                                        {% if activity.media %}
+                                            {% if activity.media|length == 1 %}
+                                                {% set media = activity.media|first %}
+                                                {% if media.media_type == 'صورة' %}
+                                                <a href="/assets/activities/{{ media.file_path }}" data-lightbox="activities" data-title="{{ activity.name }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl activity-button">
+                                                    عرض الصورة
+                                                    <svg class="w-4 h-4 mr-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                    </svg>
+                                                </a>
+                                                {% else %}
+                                                <button onclick="playVideo('{{ media.file_path }}', '{{ activity.name }}')" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl activity-button">
+                                                    تشغيل الفيديو
+                                                    <svg class="w-4 h-4 mr-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                                    </svg>
+                                                </button>
+                                                {% endif %}
+                                            {% else %}
+                                            <button data-activity-id="{{ activity.id }}" data-activity-name="{{ activity.name }}" onclick="showActivityGalleryFromData(this)" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-500 to-teal-600 text-white rounded-lg font-medium hover:from-green-600 hover:to-teal-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl activity-button cursor-pointer relative z-20" style="pointer-events: auto;">
+                                                عرض المعرض ({{ activity.media|length }})
+                                                <svg class="w-4 h-4 mr-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z"/>
+                                                </svg>
+                                            </button>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Video Modal -->
+    <div id="videoModal" class="fixed inset-0 bg-black bg-opacity-75 hidden z-[60] flex items-center justify-center p-0">
+        <div class="bg-white rounded-lg w-full h-full max-w-none max-h-none overflow-hidden flex flex-col">
+            <div class="flex items-center justify-between p-4 border-b bg-gray-50 flex-shrink-0">
+                <h3 id="videoTitle" class="text-lg font-bold text-gray-800"></h3>
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    <!-- Video Share Buttons -->
+                    <button onclick="shareOnWhatsApp(document.getElementById('videoTitle').textContent, 'فيديو من معرض أنشطة مدرسة الواحة', window.currentVideoUrl)" class="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full transition-colors">
+                        <i class="fab fa-whatsapp"></i>
+                    </button>
+                    <button onclick="shareOnFacebook(document.getElementById('videoTitle').textContent, window.currentVideoUrl)" class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full transition-colors">
+                        <i class="fab fa-facebook"></i>
+                    </button>
+                    <button onclick="shareOnTwitter(document.getElementById('videoTitle').textContent, window.currentVideoUrl)" class="bg-blue-400 hover:bg-blue-500 text-white p-2 rounded-full transition-colors">
+                        <i class="fab fa-twitter"></i>
+                    </button>
+                    <button onclick="shareOnTelegram(document.getElementById('videoTitle').textContent, window.currentVideoUrl)" class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full transition-colors">
+                        <i class="fab fa-telegram"></i>
+                    </button>
+                    <button onclick="closeVideoModal()" class="text-gray-500 hover:text-gray-700 transition-colors duration-200">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="bg-black flex-1 p-0">
+                <div id="videoContainer" class="w-full h-full">
+                    <!-- Video element will be created here dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity Gallery Modal -->
+    <div id="activityGalleryModal" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
+            <div class="flex items-center justify-between p-4 border-b bg-gray-50 flex-shrink-0">
+                <h3 id="activityGalleryTitle" class="text-lg font-bold text-gray-800"></h3>
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    <button onclick="shareOnWhatsApp(document.getElementById('activityGalleryTitle').textContent, 'معرض أنشطة مدرسة الواحة', window.location.href)" class="bg-green-500 hover:bg-green-600 text-white p-2 rounded-full transition-colors">
+                        <i class="fab fa-whatsapp"></i>
+                    </button>
+                    <button onclick="shareOnFacebook(document.getElementById('activityGalleryTitle').textContent, window.location.href)" class="bg-blue-600 hover:bg-blue-700 text-white p-2 rounded-full transition-colors">
+                        <i class="fab fa-facebook"></i>
+                    </button>
+                    <button onclick="shareOnTwitter(document.getElementById('activityGalleryTitle').textContent, window.location.href)" class="bg-blue-400 hover:bg-blue-500 text-white p-2 rounded-full transition-colors">
+                        <i class="fab fa-twitter"></i>
+                    </button>
+                    <button onclick="shareOnTelegram(document.getElementById('activityGalleryTitle').textContent, window.location.href)" class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full transition-colors">
+                        <i class="fab fa-telegram"></i>
+                    </button>
+                    <button onclick="closeActivityGalleryModal()" class="text-gray-500 hover:text-gray-700 transition-colors duration-200">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6">
+                <div id="activityGalleryContent" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- سيتم إضافة المحتوى هنا ديناميكياً -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer id="footer" class="bg-gray-800 text-white pt-16 pb-8 mt-12">
+        <div class="container mx-auto px-6">
+            <div class="text-center text-gray-400">&copy; {{ current_year }} 
+            {% if school_settings and school_settings.school_name %}
+                {{ school_settings.school_name }}
+            {% else %}
+                سجل بيانات المدرسة من الاعدادات
+            {% endif %}. 
+            جميع الحقوق محفوظة.
+        </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+    
+    <script>
+        // متغيرات عامة - تعريف في البداية
+        let currentActivityId = null;
+        let currentActivityMedia = [];
+        
+        // Initialize Lightbox
+        lightbox.option({
+            'resizeDuration': 200,
+            'wrapAround': true,
+            'albumLabel': 'صورة %1 من %2'
+        });
+
+        // Initialize video player
+        let player = null;
+        window.currentVideoUrl = '';
+
+        function playVideo(videoPath, title) {
+            const modal = document.getElementById('videoModal');
+            const videoTitle = document.getElementById('videoTitle');
+            const videoContainer = document.getElementById('videoContainer');
+            
+            videoTitle.textContent = title;
+            window.currentVideoUrl = `${window.location.origin}/assets/activities/${videoPath}`;
+            modal.classList.remove('hidden');
+
+            // Remove any previous video element
+            videoContainer.innerHTML = '';
+            
+            // Create new video element
+            const newVideo = document.createElement('video');
+            newVideo.id = 'videoPlayer';
+            newVideo.className = 'video-js vjs-default-skin';
+            newVideo.setAttribute('controls', '');
+            newVideo.setAttribute('preload', 'auto');
+            newVideo.setAttribute('autoplay', '');
+            newVideo.setAttribute('muted', '');
+            newVideo.style.width = '100%';
+            newVideo.style.height = '100%';
+            videoContainer.appendChild(newVideo);
+
+            // Initialize Video.js
+            window.player = videojs('videoPlayer', {
+                controls: true,
+                autoplay: true,
+                preload: 'auto',
+                fluid: false,
+                responsive: false,
+                muted: true,
+                width: '100%',
+                height: '100%',
+                playbackRates: [0.5, 1, 1.25, 1.5, 2]
+            });
+            window.player.src({
+                src: `/assets/activities/${videoPath}`,
+                type: 'video/mp4'
+            });
+            
+            // Unmute after loading
+            window.player.ready(function() {
+                window.player.muted(false);
+            });
+        }
+
+        function closeVideoModal() {
+            const modal = document.getElementById('videoModal');
+            modal.classList.add('hidden');
+            
+            if (window.player) {
+                window.player.pause();
+                window.player.dispose();
+                window.player = null;
+            }
+            
+            // Remove video element
+            const videoContainer = document.getElementById('videoContainer');
+            videoContainer.innerHTML = '';
+        }
+
+        // عرض معرض الأنشطة
+        async function showActivityGallery(activityId, activityName) {
+            console.log('بداية showActivityGallery');
+            console.log('قبل التعيين - currentActivityId:', currentActivityId);
+            currentActivityId = activityId;
+            console.log('بعد التعيين - currentActivityId:', currentActivityId);
+            console.log('جاري جلب وسائط النشاط:', activityId);
+            
+            // إظهار مؤشر تحميل
+            const modal = document.getElementById('activityGalleryModal');
+            const title = document.getElementById('activityGalleryTitle');
+            const content = document.getElementById('activityGalleryContent');
+            
+            console.log('الـ modal:', modal);
+            console.log('العنوان:', title);
+            console.log('المحتوى:', content);
+            
+            if (!modal || !title || !content) {
+                console.error('عناصر الـ modal غير موجودة');
+                alert('خطأ في تحميل معرض الأنشطة');
+                return;
+            }
+            
+            title.textContent = `معرض النشاط: ${activityName}`;
+            content.innerHTML = '<div class="col-span-full text-center py-8"><div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div><p class="mt-2 text-gray-600">جاري التحميل...</p></div>';
+            modal.classList.remove('hidden');
+            console.log('تم إظهار الـ modal');
+            
+            try {
+                const url = `/activities/${activityId}/media`;
+                console.log('جاري إرسال طلب إلى:', url);
+                
+                const response = await fetch(url);
+                console.log('استجابة الخادم:', response.status);
+                console.log('استجابة الخادم:', response);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('نتيجة جلب الوسائط:', result);
+                
+                if (result.success && result.media) {
+                    currentActivityMedia = result.media;
+                    displayActivityGallery(activityName, result.media);
+                } else {
+                    console.error('خطأ في جلب وسائط النشاط:', result.message || 'لا توجد وسائط متاحة');
+                    displayActivityGallery(activityName, []); // عرض معرض فارغ
+                }
+            } catch (error) {
+                console.error('خطأ في جلب وسائط النشاط:', error);
+                displayActivityGallery(activityName, []); // عرض معرض فارغ بدلاً من alert
+            }
+        }
+
+        // عرض معرض الأنشطة من data attributes
+        function showActivityGalleryFromData(button) {
+            console.log('تم استدعاء showActivityGalleryFromData');
+            console.log('الزر:', button);
+            
+            const activityId = button.getAttribute('data-activity-id');
+            const activityName = button.getAttribute('data-activity-name');
+            console.log('عرض معرض النشاط:', activityId, activityName);
+            
+            if (!activityId || !activityName) {
+                console.error('بيانات النشاط غير موجودة:', { activityId, activityName });
+                alert('خطأ في بيانات النشاط');
+                return;
+            }
+            
+            // إضافة تأثير بصري للزر
+            button.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                button.style.transform = '';
+            }, 150);
+            
+            showActivityGallery(activityId, activityName);
+        }
+
+        // عرض معرض الأنشطة في Modal
+        function displayActivityGallery(activityName, media) {
+            const modal = document.getElementById('activityGalleryModal');
+            const title = document.getElementById('activityGalleryTitle');
+            const content = document.getElementById('activityGalleryContent');
+
+            title.textContent = `معرض النشاط: ${activityName}`;
+            content.innerHTML = '';
+
+            if (!media || media.length === 0) {
+                content.innerHTML = '<div class="col-span-full text-center py-8 text-gray-500">لا توجد وسائط متاحة لهذا النشاط</div>';
+            } else {
+                media.forEach((item, index) => {
+                    const mediaCard = createGalleryMediaCard(item, index, media.length);
+                    content.appendChild(mediaCard);
+                });
+            }
+
+            // لا نحتاج لإظهار الـ modal مرة أخرى لأنه تم إظهاره مسبقاً
+        }
+
+        // إنشاء بطاقة الوسائط للمعرض
+        function createGalleryMediaCard(media, index, totalCount) {
+            const card = document.createElement('div');
+            card.className = 'bg-gray-50 rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105';
+
+            let mediaContent = '';
+            if (media.media_type === 'صورة') {
+                mediaContent = `
+                    <a href="/assets/activities/${media.file_path}" data-lightbox="activity-gallery" data-title="${media.file_name}" class="block">
+                        <img src="/assets/activities/${media.file_path}" alt="${media.file_name}" 
+                             class="w-full h-48 object-cover hover:scale-110 transition-transform duration-300">
+                    </a>
+                `;
+            } else {
+                mediaContent = `
+                    <div class="relative w-full h-48 bg-gray-200 overflow-hidden">
+                        ${media.thumbnail_path ? 
+                            `<img src="/assets/activities/${media.thumbnail_path}" alt="${media.file_name}" class="w-full h-full object-cover">` :
+                            '<div class="w-full h-full flex items-center justify-center"><i class="fas fa-video text-4xl text-gray-400"></i></div>'
+                        }
+                        <button onclick="playVideo('${media.file_path}', '${media.file_name}')" 
+                                class="absolute inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-30 hover:bg-opacity-50 transition-all">
+                            <i class="fas fa-play-circle text-4xl text-white"></i>
+                        </button>
+                    </div>
+                `;
+            }
+
+            card.innerHTML = `
+                ${mediaContent}
+                <div class="p-4">
+                    <p class="text-sm font-medium text-gray-800 truncate mb-2">${media.file_name}</p>
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs px-2 py-1 rounded ${media.media_type === 'صورة' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}">
+                            ${media.media_type === 'صورة' ? '📷 صورة' : '🎥 فيديو'}
+                        </span>
+                        <span class="text-xs text-gray-500">${index + 1} من ${totalCount}</span>
+                    </div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        // إغلاق modal المعرض
+        function closeActivityGalleryModal() {
+            const modal = document.getElementById('activityGalleryModal');
+            modal.classList.add('hidden');
+            currentActivityId = null;
+            currentActivityMedia = [];
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('videoModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeVideoModal();
+            }
+        });
+
+        document.getElementById('activityGalleryModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeActivityGalleryModal();
+            }
+        });
+
+        // إغلاق modals عند الضغط على ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeVideoModal();
+                closeActivityGalleryModal();
+            }
+        });
+
+        // Share functions
+        function toggleShareDropdown(index) {
+            const dropdown = document.getElementById(`shareDropdown${index}`);
+            const allDropdowns = document.querySelectorAll('.share-dropdown');
+            
+            // Close all other dropdowns
+            allDropdowns.forEach(dd => {
+                if (dd !== dropdown) {
+                    dd.classList.add('hidden');
+                }
+            });
+            
+            // Toggle current dropdown
+            dropdown.classList.toggle('hidden');
+        }
+
+        function shareOnWhatsApp(title, description, url) {
+            const text = `${title}\n\n${description}\n\n${url}`;
+            const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+            window.open(whatsappUrl, '_blank');
+            closeAllShareDropdowns();
+        }
+
+        function shareOnFacebook(title, url) {
+            const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(title)}`;
+            window.open(facebookUrl, '_blank', 'width=600,height=400');
+            closeAllShareDropdowns();
+        }
+
+        function shareOnTwitter(title, url) {
+            const text = `${title} - معرض أنشطة مدرسة الواحة`;
+            const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`;
+            window.open(twitterUrl, '_blank', 'width=600,height=400');
+            closeAllShareDropdowns();
+        }
+
+        function shareOnTelegram(title, url) {
+            const text = `${title}\n\nمعرض أنشطة مدرسة الواحة\n\n${url}`;
+            const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+            window.open(telegramUrl, '_blank');
+            closeAllShareDropdowns();
+        }
+
+        function copyLink(url) {
+            navigator.clipboard.writeText(url).then(function() {
+                // Success message removed
+            }).catch(function() {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = url;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                // Success message removed
+            });
+            closeAllShareDropdowns();
+        }
+
+        function closeAllShareDropdowns() {
+            const allDropdowns = document.querySelectorAll('.share-dropdown');
+            allDropdowns.forEach(dd => {
+                dd.classList.add('hidden');
+            });
+        }
+
+        // Simple mobile menu function
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu) {
+                mobileMenu.classList.toggle('hidden');
+            }
+        }
+
+        // Mobile menu functionality - Clean and Simple
+        document.addEventListener('DOMContentLoaded', function () {
+            console.log('تم تحميل الصفحة');
+            
+            // التحقق من وجود الأزرار
+            const buttons = document.querySelectorAll('button[data-activity-id]');
+            console.log('عدد أزرار عرض المعرض:', buttons.length);
+            buttons.forEach((btn, index) => {
+                console.log(`الزر ${index + 1}:`, {
+                    id: btn.getAttribute('data-activity-id'),
+                    name: btn.getAttribute('data-activity-name'),
+                    element: btn
+                });
+            });
+            
+            // إضافة event listeners للأزرار
+            document.addEventListener('click', function(e) {
+                if (e.target.closest('button[data-activity-id]')) {
+                    const button = e.target.closest('button[data-activity-id]');
+                    console.log('تم الضغط على زر عرض المعرض:', button);
+                    showActivityGalleryFromData(button);
+                }
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(e) {
+                const mobileMenu = document.getElementById('mobile-menu');
+                const menuButton = document.getElementById('mobile-menu-button');
+                
+                if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                    if (!mobileMenu.contains(e.target) && !menuButton?.contains(e.target)) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                }
+            });
+            
+            // Close share dropdowns when clicking outside
+            document.addEventListener('click', function(e) {
+                // إغلاق قوائم المشاركة
+                if (!e.target.closest('.share-dropdown') && !e.target.closest('button[onclick*="toggleShareDropdown"]')) {
+                    closeAllShareDropdowns();
+                }
+                
+                // إغلاق القائمة المتنقلة
+                if (mobileMenu && !mobileMenu.contains(e.target) && !menuButton?.contains(e.target)) {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+
+            // Close share dropdowns and mobile menu when pressing ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    closeAllShareDropdowns();
+                    const mobileMenu = document.getElementById('mobile-menu');
+                    if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                        console.log('Menu closed by ESC key');
+                    }
+                }
+            });
+            
+            // Typing Effect Enhancement
+            const typingText = document.querySelector('.typing-text');
+            if (typingText && window.innerWidth > 768) {
+                const text = typingText.textContent;
+                typingText.textContent = '';
+                let i = 0;
+                
+                function typeWriter() {
+                    if (i < text.length) {
+                        typingText.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, 100);
+                    }
+                }
+                
+                // Start typing after a delay
+                setTimeout(typeWriter, 500);
+            }
+            
+            // Button Hover Effects
+            const ctaButton = document.querySelector('a[href="#activities-content"]');
+            if (ctaButton) {
+                ctaButton.addEventListener('mouseenter', () => {
+                    ctaButton.style.boxShadow = '0 20px 40px rgba(255, 193, 7, 0.4)';
+                });
+                
+                ctaButton.addEventListener('mouseleave', () => {
+                    ctaButton.style.boxShadow = '';
+                });
+            }
+            
+            // Smooth Scroll for Navigation Links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

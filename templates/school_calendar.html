@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>التقويم المدرسي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+    
+    <!-- jsPDF for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    
+    <!-- html2canvas for capturing calendar -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Arabic Font Support -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Custom Animations and Effects */
+        @keyframes fade-in-up {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in-up {
+            animation: fade-in-up 1s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .animation-delay-100 { animation-delay: 0.1s; }
+        .animation-delay-200 { animation-delay: 0.2s; }
+        .animation-delay-300 { animation-delay: 0.3s; }
+        .animation-delay-400 { animation-delay: 0.4s; }
+        .animation-delay-500 { animation-delay: 0.5s; }
+        .animation-delay-600 { animation-delay: 0.6s; }
+        .animation-delay-700 { animation-delay: 0.7s; }
+        .animation-delay-800 { animation-delay: 0.8s; }
+        .animation-delay-1000 { animation-delay: 1s; }
+        
+        /* Additional Animation Delays */
+        .delay-1000 { animation-delay: 1s; }
+        .delay-2000 { animation-delay: 2s; }
+        .delay-3000 { animation-delay: 3s; }
+        
+        /* Typing Effect */
+        @keyframes typing {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+        
+        @keyframes blink {
+            0%, 50% { border-color: transparent; }
+            51%, 100% { border-color: white; }
+        }
+        
+        .typing-text {
+            display: inline-block;
+            overflow: visible;
+            white-space: nowrap;
+            border-right: 3px solid white;
+            animation: typing 3s steps(40, end), blink 0.75s step-end infinite;
+            line-height: 1.2;
+            padding: 0.1em 0;
+        }
+
+        /* Enhanced Button Styles */
+        .cta-button {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        /* Enhanced Hover Effects */
+        .hover-glow:hover {
+            box-shadow: 0 0 30px rgba(255, 193, 7, 0.5);
+        }
+        
+        /* Glass Morphism Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Fix for Arabic Text Clipping */
+        .overflow-visible {
+            overflow: visible !important;
+        }
+        
+        /* Enhanced Arabic Typography */
+        h1, h2, h3, h4, h5, h6 {
+            line-height: 1.4 !important;
+            padding: 0.1em 0 !important;
+        }
+        
+        /* Ensure Arabic text displays properly */
+        .arabic-text {
+            text-rendering: optimizeLegibility;
+            font-feature-settings: "liga" 1, "kern" 1;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .typing-text {
+                animation: none;
+                border-right: none;
+            }
+        }
+        
+        .calendar-container {
+            direction: ltr; /* FullCalendar needs LTR for proper layout */
+        }
+        
+        .fc {
+            direction: ltr;
+            font-family: 'Cairo', sans-serif;
+        }
+        
+        .fc-toolbar-title {
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 700 !important;
+        }
+        
+        .fc-button {
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+        }
+        
+        .fc-daygrid-day-number {
+            font-family: 'Cairo', sans-serif !important;
+        }
+        
+        .fc-col-header-cell {
+            font-family: 'Cairo', sans-serif !important;
+            font-weight: 600 !important;
+        }
+        
+        .event-exam {
+            background-color: #ef4444 !important;
+            border-color: #dc2626 !important;
+        }
+        
+        .event-activity {
+            background-color: #3b82f6 !important;
+            border-color: #2563eb !important;
+        }
+        
+        .event-holiday {
+            background-color: #10b981 !important;
+            border-color: #059669 !important;
+        }
+        
+        .event-meeting {
+            background-color: #f97316 !important;
+            border-color: #ea580c !important;
+        }
+        
+        .filter-button {
+            transition: all 0.2s ease;
+        }
+        
+        .filter-button:hover {
+            transform: translateY(-1px);
+        }
+        
+        .filter-button.active {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .modal-overlay {
+            backdrop-filter: blur(4px);
+        }
+        
+        .print-only {
+            display: none;
+        }
+        
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-only {
+                display: block !important;
+            }
+            .fc {
+                font-size: 12px !important;
+            }
+        }
+        
+        .fc-event {
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: normal !important;
+            overflow: visible !important;
+            text-overflow: unset !important;
+        }
+        
+        .fc-event:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .fc-event-title {
+            white-space: normal !important;
+            overflow: visible !important;
+            display: block !important;
+            padding: 2px 4px !important;
+            line-height: 1.4 !important;
+            font-size: 11px !important;
+            font-weight: bold !important;
+            word-wrap: break-word !important;
+            word-break: break-word !important;
+            max-height: none !important;
+            text-overflow: unset !important;
+        }
+        
+        /* Horizontal Calendar Slider Styles */
+        .calendar-slider-container {
+            position: relative;
+            width: 100%;
+        }
+        
+        .calendar-horizontal-scroll {
+            scroll-behavior: smooth;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE and Edge */
+        }
+        
+        .calendar-horizontal-scroll::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+        
+        .calendar-content-wrapper {
+            min-width: 1200px; /* Minimum width to prevent shrinking */
+            width: 100%;
+            scroll-snap-align: start;
+        }
+        
+        .calendar-container {
+            width: 100%;
+            min-width: 1200px; /* Ensure calendar doesn't shrink below this width */
+        }
+        
+        /* Scroll Indicators */
+        .scroll-indicators {
+            transition: opacity 0.3s ease;
+        }
+        
+        .scroll-btn {
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+        
+        .scroll-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Show scroll indicators when needed */
+        .scroll-indicator-left.show {
+            opacity: 1;
+        }
+        
+        .scroll-indicator-right.show {
+            opacity: 1;
+        }
+        
+        .scroll-btn.show {
+            opacity: 1 !important;
+            transform: translateX(0) !important;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .calendar-content-wrapper {
+                min-width: 1000px; /* Slightly smaller on mobile but still maintains width */
+            }
+            
+            .calendar-container {
+                min-width: 1000px;
+            }
+            
+            .mobile-scroll-hint {
+                animation: pulse 2s infinite;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .calendar-content-wrapper {
+                min-width: 900px; /* Even smaller for very small screens */
+            }
+            
+            .calendar-container {
+                min-width: 900px;
+            }
+        }
+        
+        /* Touch gesture improvements */
+        .calendar-horizontal-scroll {
+            touch-action: pan-x pinch-zoom;
+        }
+        
+        /* Smooth scroll snap */
+        .calendar-horizontal-scroll {
+            scroll-snap-type: x proximity;
+        }
+        
+        /* Enhanced scrollbar hiding */
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        
+        /* تحسين عرض النص في PDF */
+        .fc-daygrid-event-harness {
+            min-height: 28px !important;
+        }
+        
+        /* تحسين عرض الخلايا لضمان ظهور النص بشكل كامل */
+        .fc-daygrid-day {
+            min-height: 80px !important;
+            height: auto !important;
+            overflow: visible !important;
+        }
+        
+        /* تحسين عرض الأحداث في التقويم */
+        .fc-daygrid-event {
+            height: auto !important;
+            min-height: 28px !important;
+            white-space: normal !important;
+            overflow: visible !important;
+            word-wrap: break-word !important;
+            word-break: break-word !important;
+        }
+        
+        .event-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-left: 6px;
+        }
+        
+        .dot-exam { background-color: #ef4444; }
+        .dot-activity { background-color: #3b82f6; }
+        .dot-holiday { background-color: #10b981; }
+        .dot-meeting { background-color: #f97316; }
+    </style>
+</head>
+<body class="font-['Cairo'] bg-gradient-to-br from-blue-50 to-green-100 min-h-screen">
+    <!-- Combined Header and Hero Section -->
+    <section class="relative bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 overflow-hidden">
+        <!-- Static Gradient Background -->
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900"></div>
+        
+        <!-- Overlay for Text Clarity -->
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
+        
+        <!-- Header Navigation -->
+        <div class="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-32 md:h-36 lg:h-40">
+                <!-- Right: Logo -->
+                <div class="flex items-center flex-shrink-0">
+                    {% if school_settings and school_settings.school_logo %}
+                    <img src="/assets/images/{{ school_settings.school_logo }}" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto drop-shadow-lg ">
+                {% else %}
+                    {% if school_settings and school_settings.school_logo %}
+                    <img src="/assets/images/{{ school_settings.school_logo }}" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto drop-shadow-lg ">
+                {% else %}
+                    <img src="/assets/images/logo.png" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto drop-shadow-lg ">
+                {% endif %}
+                {% endif %}
+                </div>
+                <!-- Center: School Name (always visible) -->
+                <div class="flex-1 flex justify-center">
+                    <span class="text-base md:text-3xl font-extrabold text-yellow-400 tracking-wide font-['Cairo','Noto Kufi Arabic',sans-serif] select-none">
+                        {% if school_settings and school_settings.school_name %}
+                            {{ school_settings.school_name }}
+                        {% else %}
+                            سجل بيانات المدرسة من الاعدادات
+                        {% endif %}
+                    </span>
+                </div>
+                <!-- Left: Navigation & Hamburger -->
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    {% if session.get('role') == 'مشرف' %}
+                    <!-- Desktop Nav -->
+                    <nav class="hidden md:flex items-center space-x-1 space-x-reverse mr-4">
+                        <a href="/admin" class="px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">لوحة التحكم</a>
+                        <a href="/logout" class="px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">تسجيل الخروج</a>
+                    </nav>
+                    <!-- Mobile menu button -->
+                    <button id="mobileMenuButton" onclick="toggleMobileMenu()" class="md:hidden flex items-center justify-center w-11 h-11 rounded-lg bg-white/10 text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-yellow-300 transition-all duration-300" aria-label="فتح القائمة">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                        </svg>
+                    </button>
+                    {% else %}
+                    <!-- Desktop Nav -->
+                    <nav class="hidden md:flex items-center space-x-1 space-x-reverse mr-4">
+                        <a href="/" class="px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">الرئيسية</a>
+                    </nav>
+                    <!-- Mobile menu button -->
+                    <button id="mobileMenuButton2" onclick="toggleMobileMenu()" class="md:hidden flex items-center justify-center w-11 h-11 rounded-lg bg-white/10 text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-yellow-300 transition-all duration-300" aria-label="فتح القائمة">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                        </svg>
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation -->
+        <div id="mobileMenu" class="hidden md:hidden bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900/95 backdrop-blur-sm border-t border-white/10 z-40 relative">
+            <nav class="flex flex-col py-2 px-4 space-y-1">
+                {% if session.get('role') == 'مشرف' %}
+                <a href="/admin" class="block px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">لوحة التحكم</a>
+                <a href="/logout" class="block px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">تسجيل الخروج</a>
+                {% else %}
+                <a href="/" class="block px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">الرئيسية</a>
+                {% endif %}
+            </nav>
+        </div>
+        
+        <!-- Hero Content -->
+        <div class="relative z-10 container mx-auto px-6 flex flex-col justify-center items-center text-center pb-32">
+            <!-- Main Title with Typing Effect -->
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-8 text-white drop-shadow-2xl leading-relaxed animate-fade-in-up animation-delay-200 overflow-visible mt-16">
+                <span class="typing-text">التقويم المدرسي</span>
+            </h1>
+            
+            <!-- Subtitle -->
+            <p class="text-xl md:text-2xl lg:text-3xl mb-8 max-w-4xl text-white/90 drop-shadow-lg leading-relaxed animate-fade-in-up animation-delay-400">
+                تابع جميع الأحداث والفعاليات المدرسية
+            </p>
+        </div>
+    </section>
+
+    <!-- Calendar Content Section -->
+    <section id="calendar-content" class="py-20 bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 relative overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 opacity-5">
+            <div class="absolute top-20 left-10 w-32 h-32 bg-blue-400 rounded-full blur-3xl"></div>
+            <div class="absolute bottom-20 right-10 w-40 h-40 bg-purple-400 rounded-full blur-3xl"></div>
+            <div class="absolute top-1/2 left-1/2 w-24 h-24 bg-green-400 rounded-full blur-2xl"></div>
+        </div>
+        
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="max-w-7xl mx-auto">
+
+            <!-- أدوات التحكم -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6 no-print">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <!-- فلترة الأحداث -->
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-sm font-semibold text-gray-700">فلترة الأحداث:</span>
+                        <button onclick="filterEvents('all')" class="filter-button active px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-700 hover:bg-blue-200">
+                            <span class="event-dot dot-exam"></span>
+                            الكل
+                        </button>
+                        <button onclick="filterEvents('exam')" class="filter-button px-3 py-1 rounded-full text-sm bg-red-100 text-red-700 hover:bg-red-200">
+                            <span class="event-dot dot-exam"></span>
+                            الامتحانات
+                        </button>
+                        <button onclick="filterEvents('activity')" class="filter-button px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-700 hover:bg-blue-200">
+                            <span class="event-dot dot-activity"></span>
+                            الفعاليات
+                        </button>
+                        <button onclick="filterEvents('holiday')" class="filter-button px-3 py-1 rounded-full text-sm bg-green-100 text-green-700 hover:bg-green-200">
+                            <span class="event-dot dot-holiday"></span>
+                            العطلات
+                        </button>
+                        <button onclick="filterEvents('meeting')" class="filter-button px-3 py-1 rounded-full text-sm bg-orange-100 text-orange-700 hover:bg-orange-200">
+                            <span class="event-dot dot-meeting"></span>
+                            الاجتماعات
+                        </button>
+                    </div>
+
+                    <!-- أزرار الإجراءات -->
+                    <div class="flex items-center gap-2">
+                        {% if session.get('role') == 'مشرف' or session.get('role') == 'مشرف محتوى' %}
+                        <button onclick="addEvent()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
+                            <i class="fas fa-plus"></i>
+                            إضافة حدث
+                        </button>
+                        {% endif %}
+                        <!-- زر الطباعة مخفي -->
+                        <!-- <button onclick="printCalendar()" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors flex items-center gap-2">
+                            <i class="fas fa-print"></i>
+                            طباعة
+                        </button> -->
+                        <button id="exportPdfBtn" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center gap-2">
+                            <i class="fas fa-file-pdf"></i>
+                            تنزيل PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- التقويم مع شريط التمرير الأفقي -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <!-- Calendar Slider Container -->
+                <div class="calendar-slider-container relative">
+                    <!-- Horizontal Scroll Container -->
+                    <div class="calendar-horizontal-scroll overflow-x-auto overflow-y-hidden scrollbar-hide">
+                        <div class="calendar-content-wrapper min-w-full">
+                            <div id="calendar" class="calendar-container"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Scroll Indicators -->
+                    <div class="scroll-indicators hidden md:flex absolute top-1/2 transform -translate-y-1/2 w-full pointer-events-none z-10">
+                        <!-- Left Scroll Indicator -->
+                        <div class="scroll-indicator-left absolute left-0 bg-gradient-to-r from-white via-white/80 to-transparent w-8 h-full flex items-center justify-center pointer-events-auto">
+                            <button id="scrollLeftBtn" class="scroll-btn bg-white/90 hover:bg-white text-gray-600 hover:text-gray-800 rounded-full p-2 shadow-lg transition-all duration-300 opacity-0 transform -translate-x-2" aria-label="التمرير لليسار">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <!-- Right Scroll Indicator -->
+                        <div class="scroll-indicator-right absolute right-0 bg-gradient-to-l from-white via-white/80 to-transparent w-8 h-full flex items-center justify-center pointer-events-auto">
+                            <button id="scrollRightBtn" class="scroll-btn bg-white/90 hover:bg-white text-gray-600 hover:text-gray-800 rounded-full p-2 shadow-lg transition-all duration-300 opacity-0 transform translate-x-2" aria-label="التمرير لليمين">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Mobile Scroll Hint -->
+                    <div class="mobile-scroll-hint md:hidden absolute bottom-2 left-1/2 transform -translate-x-1/2 bg-black/70 text-white text-xs px-3 py-1 rounded-full opacity-80 animate-pulse">
+                        <i class="fas fa-arrows-alt-h mr-1"></i>
+                        اسحب للتمرير
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal تفاصيل الحدث -->
+    <div id="eventModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4 modal-overlay">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between p-6 border-b">
+                <h3 id="eventModalTitle" class="text-lg font-bold text-gray-800">تفاصيل الحدث</h3>
+                <button onclick="closeEventModal()" class="text-gray-500 hover:text-gray-700 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-6">
+                <div id="eventModalContent">
+                    <!-- سيتم ملء المحتوى ديناميكياً -->
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 p-6 border-t">
+                {% if session.get('role') == 'مشرف' or session.get('role') == 'مشرف محتوى' %}
+                <button onclick="editEvent()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    تعديل
+                </button>
+                <button onclick="deleteEvent()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+                    حذف
+                </button>
+                {% endif %}
+                <button onclick="closeEventModal()" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                    إغلاق
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal إضافة/تعديل حدث -->
+    <div id="addEventModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50 flex items-center justify-center p-4 modal-overlay">
+        <div class="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between p-6 border-b">
+                <h3 id="addEventModalTitle" class="text-lg font-bold text-gray-800">إضافة حدث جديد</h3>
+                <button onclick="closeAddEventModal()" class="text-gray-500 hover:text-gray-700 transition-colors">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <form id="eventForm" class="p-6 space-y-4">
+                <input type="hidden" id="eventId" name="eventId">
+                
+                <div>
+                    <label for="eventTitle" class="block text-sm font-medium text-gray-700 mb-1">عنوان الحدث</label>
+                    <input type="text" id="eventTitle" name="title" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label for="eventType" class="block text-sm font-medium text-gray-700 mb-1">نوع الحدث</label>
+                    <select id="eventType" name="type" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        <option value="exam">امتحان</option>
+                        <option value="activity">فعالية مدرسية</option>
+                        <option value="holiday">عطلة رسمية</option>
+                        <option value="meeting">اجتماع أولياء الأمور</option>
+                    </select>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label for="eventStart" class="block text-sm font-medium text-gray-700 mb-1">تاريخ البداية</label>
+                        <input type="date" id="eventStart" name="start" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label for="eventEnd" class="block text-sm font-medium text-gray-700 mb-1">تاريخ النهاية</label>
+                        <input type="date" id="eventEnd" name="end" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                </div>
+                
+                <div>
+                    <label for="eventTime" class="block text-sm font-medium text-gray-700 mb-1">الوقت (اختياري)</label>
+                    <input type="time" id="eventTime" name="time" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label for="eventLocation" class="block text-sm font-medium text-gray-700 mb-1">الموقع (اختياري)</label>
+                    <input type="text" id="eventLocation" name="location" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                </div>
+                
+                <div>
+                    <label for="eventDescription" class="block text-sm font-medium text-gray-700 mb-1">الوصف</label>
+                    <textarea id="eventDescription" name="description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                </div>
+            </form>
+            <div class="flex items-center justify-end gap-2 p-6 border-t">
+                <button onclick="closeAddEventModal()" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+                    إلغاء
+                </button>
+                <button onclick="saveEvent()" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                    حفظ
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales/ar.global.min.js"></script>
+    
+    <!-- Server-side data -->
+    <div id="server-data" 
+         data-is-admin="{{ 'true' if session.get('role') == 'مشرف' or session.get('role') == 'مشرف محتوى' else 'false' }}"
+         style="display: none;">
+    </div>
+    
+    <script>
+        // Simple mobile menu function
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            if (mobileMenu) {
+                mobileMenu.classList.toggle('hidden');
+            }
+        }
+        
+        let calendar;
+        let currentEvent = null;
+        let events = [];
+
+        // تحميل الأحداث من قاعدة البيانات
+        async function loadEvents() {
+            try {
+                const response = await fetch('/api/calendar/events');
+                const data = await response.json();
+                events = data;
+                return data;
+            } catch (error) {
+                console.error('خطأ في تحميل الأحداث:', error);
+                return [];
+            }
+        }
+
+        // تهيئة التقويم
+        document.addEventListener('DOMContentLoaded', async function() {
+            const calendarEl = document.getElementById('calendar');
+            
+            // تحميل الأحداث من قاعدة البيانات
+            await loadEvents();
+            
+            // التحقق من صلاحيات المستخدم
+            const serverData = document.getElementById('server-data');
+            const isAdmin = serverData.getAttribute('data-is-admin') === 'true';
+            
+            calendar = new FullCalendar.Calendar(calendarEl, {
+                locale: 'ar',
+                direction: 'rtl',
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,listWeek'
+                },
+                buttonText: {
+                    today: 'اليوم',
+                    month: 'شهر',
+                    week: 'أسبوع',
+                    list: 'قائمة'
+                },
+                height: 'auto',
+                events: events,
+                eventClassNames: function(arg) {
+                    return [`event-${arg.event.extendedProps.type}`];
+                },
+                eventClick: function(info) {
+                    showEventDetails(info.event);
+                },
+                dateClick: function(info) {
+                    // إضافة حدث فقط للمشرفين
+                    if (isAdmin) {
+                        addEvent(info.dateStr);
+                    }
+                },
+                eventDisplay: 'block',
+                dayMaxEvents: 5,
+                moreLinkClick: 'popover',
+                eventContent: function(arg) {
+                    return {
+                        html: `<div class="fc-event-title" style="white-space: normal; overflow: visible; word-wrap: break-word; word-break: break-word; line-height: 1.4; font-size: 11px; font-weight: bold; padding: 2px 4px;">${arg.event.title}</div>`
+                    };
+                }
+            });
+            
+            calendar.render();
+        });
+
+        // عرض تفاصيل الحدث
+        function showEventDetails(event) {
+            currentEvent = event;
+            const modal = document.getElementById('eventModal');
+            const title = document.getElementById('eventModalTitle');
+            const content = document.getElementById('eventModalContent');
+            
+            title.textContent = event.title;
+            
+            const eventType = getEventTypeText(event.extendedProps.type);
+            const eventDate = formatDate(event.start);
+            const eventTime = event.extendedProps.time || 'غير محدد';
+            const eventLocation = event.extendedProps.location || 'غير محدد';
+            const eventDescription = event.extendedProps.description || 'لا يوجد وصف';
+            
+            content.innerHTML = `
+                <div class="space-y-4">
+                    <div class="flex items-center gap-2">
+                        <span class="event-dot dot-${event.extendedProps.type}"></span>
+                        <span class="text-sm font-medium text-gray-600">${eventType}</span>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800 mb-1">التاريخ:</h4>
+                        <p class="text-gray-600">${eventDate}</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800 mb-1">الوقت:</h4>
+                        <p class="text-gray-600">${eventTime}</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800 mb-1">الموقع:</h4>
+                        <p class="text-gray-600">${eventLocation}</p>
+                    </div>
+                    <div>
+                        <h4 class="font-semibold text-gray-800 mb-1">الوصف:</h4>
+                        <p class="text-gray-600">${eventDescription}</p>
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.remove('hidden');
+        }
+
+        // إغلاق modal تفاصيل الحدث
+        function closeEventModal() {
+            document.getElementById('eventModal').classList.add('hidden');
+            currentEvent = null;
+        }
+
+        // إضافة حدث جديد
+        function addEvent(date = null) {
+            // التحقق من صلاحيات المستخدم
+            const serverData = document.getElementById('server-data');
+            const isAdmin = serverData.getAttribute('data-is-admin') === 'true';
+            
+            if (!isAdmin) {
+                alert('عذراً، فقط المشرفين ومشرفي المحتوى يمكنهم إضافة أحداث في التقويم المدرسي');
+                return;
+            }
+            
+            const addEventModal = document.getElementById('addEventModal');
+            const addEventTitle = document.getElementById('addEventModalTitle');
+            const eventForm = document.getElementById('eventForm');
+            
+            addEventTitle.textContent = 'إضافة حدث جديد';
+            eventForm.reset();
+            
+            if (date) {
+                document.getElementById('eventStart').value = date;
+                document.getElementById('eventEnd').value = date;
+            }
+            
+            addEventModal.classList.remove('hidden');
+        }
+
+        // تعديل حدث
+        function editEvent() {
+            if (!currentEvent) return;
+            
+            // التحقق من صلاحيات المستخدم
+            const serverData = document.getElementById('server-data');
+            const isAdmin = serverData.getAttribute('data-is-admin') === 'true';
+            
+            if (!isAdmin) {
+                alert('عذراً، فقط المشرفين ومشرفي المحتوى يمكنهم تعديل أحداث التقويم المدرسي');
+                return;
+            }
+            
+            const addEventModal = document.getElementById('addEventModal');
+            const addEventTitle = document.getElementById('addEventModalTitle');
+            const eventForm = document.getElementById('eventForm');
+            
+            addEventTitle.textContent = 'تعديل الحدث';
+            
+            // ملء النموذج بالبيانات الحالية
+            document.getElementById('eventId').value = currentEvent.id;
+            document.getElementById('eventTitle').value = currentEvent.title;
+            document.getElementById('eventType').value = currentEvent.extendedProps.type;
+            document.getElementById('eventStart').value = formatDateForInput(currentEvent.start);
+            document.getElementById('eventEnd').value = formatDateForInput(currentEvent.end);
+            document.getElementById('eventTime').value = currentEvent.extendedProps.time || '';
+            document.getElementById('eventLocation').value = currentEvent.extendedProps.location || '';
+            document.getElementById('eventDescription').value = currentEvent.extendedProps.description || '';
+            
+            closeEventModal();
+            addEventModal.classList.remove('hidden');
+        }
+
+        // حذف حدث
+        async function deleteEvent() {
+            if (!currentEvent) return;
+            
+            // التحقق من صلاحيات المستخدم
+            const serverData = document.getElementById('server-data');
+            const isAdmin = serverData.getAttribute('data-is-admin') === 'true';
+            
+            if (!isAdmin) {
+                alert('عذراً، فقط المشرفين ومشرفي المحتوى يمكنهم حذف أحداث التقويم المدرسي');
+                return;
+            }
+            
+            if (confirm('هل أنت متأكد من حذف هذا الحدث؟')) {
+                try {
+                    const response = await fetch(`/api/calendar/events/${currentEvent.id}`, {
+                        method: 'DELETE'
+                    });
+                    
+                    const result = await response.json();
+                    
+                    if (result.success) {
+                        // إعادة تحميل الأحداث وتحديث التقويم
+                        await loadEvents();
+                        calendar.removeAllEvents();
+                        calendar.addEventSource(events);
+                        
+                        closeEventModal();
+                        showToast(result.message);
+                    } else {
+                        alert('حدث خطأ: ' + result.error);
+                    }
+                } catch (error) {
+                    console.error('خطأ في حذف الحدث:', error);
+                    alert('حدث خطأ في حذف الحدث');
+                }
+            }
+        }
+
+        // حفظ حدث
+        async function saveEvent() {
+            const form = document.getElementById('eventForm');
+            const formData = new FormData(form);
+            
+            const eventData = {
+                title: formData.get('title'),
+                start: formData.get('start'),
+                end: formData.get('end'),
+                type: formData.get('type'),
+                time: formData.get('time'),
+                location: formData.get('location'),
+                description: formData.get('description')
+            };
+            
+            // التحقق من صحة البيانات
+            if (!eventData.title || !eventData.start || !eventData.end) {
+                alert('يرجى ملء جميع الحقول المطلوبة');
+                return;
+            }
+            
+            const eventId = formData.get('eventId');
+            const isUpdate = eventId && eventId !== '';
+            
+            try {
+                let response;
+                if (isUpdate) {
+                    // تحديث حدث موجود
+                    response = await fetch(`/api/calendar/events/${eventId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(eventData)
+                    });
+                } else {
+                    // إضافة حدث جديد
+                    response = await fetch('/api/calendar/events', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(eventData)
+                    });
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // إعادة تحميل الأحداث وتحديث التقويم
+                    await loadEvents();
+                    calendar.removeAllEvents();
+                    calendar.addEventSource(events);
+                    
+                    closeAddEventModal();
+                    showToast(result.message);
+                } else {
+                    alert('حدث خطأ: ' + result.error);
+                }
+            } catch (error) {
+                console.error('خطأ في حفظ الحدث:', error);
+                alert('حدث خطأ في حفظ الحدث');
+            }
+        }
+
+        // إغلاق modal إضافة/تعديل حدث
+        function closeAddEventModal() {
+            document.getElementById('addEventModal').classList.add('hidden');
+        }
+
+        // فلترة الأحداث
+        async function filterEvents(type) {
+            // إزالة الفئة النشطة من جميع الأزرار
+            document.querySelectorAll('.filter-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // إضافة الفئة النشطة للزر المحدد
+            event.target.classList.add('active');
+            
+            // إعادة تحميل جميع الأحداث
+            await loadEvents();
+            
+            if (type === 'all') {
+                calendar.removeAllEvents();
+                calendar.addEventSource(events);
+            } else {
+                const filteredEvents = events.filter(event => event.type === type);
+                calendar.removeAllEvents();
+                calendar.addEventSource(filteredEvents);
+            }
+        }
+
+        // طباعة التقويم
+        function printCalendar() {
+            window.print();
+        }
+
+        // تصدير إلى PDF - طريقة محسنة لعرض النص بشكل كامل
+        async function exportToPDF() {
+            // عرض رسالة للمستخدم
+            showToast('جاري تحضير ملف PDF...');
+            
+            try {
+                // الحصول على إعدادات المدرسة
+                let schoolName = 'مدرسة الواحة';
+                let schoolAddress = '';
+                let schoolPhone = '';
+                try {
+                    const settingsResponse = await fetch('/api/school/settings');
+                    const settingsData = await settingsResponse.json();
+                    schoolName = settingsData.school_name || 'مدرسة الواحة';
+                    schoolAddress = settingsData.school_address || '';
+                    schoolPhone = settingsData.school_phone || '';
+                } catch (error) {
+                    console.error('خطأ في الحصول على إعدادات المدرسة:', error);
+                }
+                
+                // التقاط التقويم كصورة
+                const calendarEl = document.getElementById('calendar');
+                
+                // تحسين عرض الأحداث قبل التصدير
+                const calendarEvents = calendarEl.querySelectorAll('.fc-event');
+                const originalStyles = [];
+                
+                // حفظ الأنماط الأصلية وتطبيق أنماط مُحسّنة للتصدير
+                calendarEvents.forEach(event => {
+                    const eventTitle = event.querySelector('.fc-event-title');
+                    if (eventTitle) {
+                        originalStyles.push({
+                            event: event,
+                            eventStyle: event.getAttribute('style') || '',
+                            titleStyle: eventTitle.getAttribute('style') || ''
+                        });
+                        
+                        // تطبيق أنماط مُحسّنة للتصدير
+                        event.style.height = 'auto';
+                        event.style.minHeight = '28px';
+                        event.style.whiteSpace = 'normal';
+                        event.style.overflow = 'visible';
+                        event.style.wordWrap = 'break-word';
+                        event.style.wordBreak = 'break-word';
+                        
+                        eventTitle.style.whiteSpace = 'normal';
+                        eventTitle.style.overflow = 'visible';
+                        eventTitle.style.textOverflow = 'unset';
+                        eventTitle.style.display = 'block';
+                        eventTitle.style.padding = '2px 4px';
+                        eventTitle.style.lineHeight = '1.4';
+                        eventTitle.style.fontSize = '11px';
+                        eventTitle.style.fontWeight = 'bold';
+                        eventTitle.style.wordWrap = 'break-word';
+                        eventTitle.style.wordBreak = 'break-word';
+                        eventTitle.style.maxHeight = 'none';
+                    }
+                });
+                
+                // تحسين أنماط الخلايا لضمان عرض النص بشكل كامل
+                const dayCells = calendarEl.querySelectorAll('.fc-daygrid-day');
+                dayCells.forEach(cell => {
+                    cell.style.minHeight = '80px';
+                    cell.style.height = 'auto';
+                });
+                
+                // إضافة تأخير قصير لضمان تطبيق جميع الأنماط
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                // استخدام html2canvas لتحويل التقويم إلى صورة مع دقة محسنة
+                const canvas = await html2canvas(calendarEl, { 
+                    scale: 2, // دقة محسنة للنص
+                    useCORS: true,
+                    logging: false,
+                    allowTaint: true,
+                    backgroundColor: '#ffffff',
+                    letterRendering: true,
+                    width: calendarEl.offsetWidth,
+                    height: calendarEl.offsetHeight,
+                    onclone: function(clonedDoc) {
+                        // تطبيق أنماط إضافية على النسخة المستنسخة للحصول على نتائج أفضل
+                        const clonedEvents = clonedDoc.querySelectorAll('.fc-event-title');
+                        clonedEvents.forEach(event => {
+                            event.style.whiteSpace = 'normal';
+                            event.style.overflow = 'visible';
+                            event.style.fontWeight = 'bold';
+                            event.style.fontSize = '11px';
+                            event.style.lineHeight = '1.4';
+                            event.style.wordWrap = 'break-word';
+                            event.style.wordBreak = 'break-word';
+                            event.style.maxHeight = 'none';
+                            event.style.textOverflow = 'unset';
+                        });
+                        
+                        // تحسين أنماط الخلايا في النسخة المستنسخة
+                        const clonedCells = clonedDoc.querySelectorAll('.fc-daygrid-day');
+                        clonedCells.forEach(cell => {
+                            cell.style.minHeight = '80px';
+                            cell.style.height = 'auto';
+                            cell.style.overflow = 'visible';
+                        });
+                        
+                        // تحسين أنماط الأحداث في النسخة المستنسخة
+                        const clonedEventElements = clonedDoc.querySelectorAll('.fc-event');
+                        clonedEventElements.forEach(event => {
+                            event.style.height = 'auto';
+                            event.style.minHeight = '28px';
+                            event.style.whiteSpace = 'normal';
+                            event.style.overflow = 'visible';
+                            event.style.wordWrap = 'break-word';
+                            event.style.wordBreak = 'break-word';
+                        });
+                    }
+                });
+                
+                // استعادة الأنماط الأصلية
+                originalStyles.forEach(item => {
+                    item.event.setAttribute('style', item.eventStyle);
+                    const eventTitle = item.event.querySelector('.fc-event-title');
+                    if (eventTitle) {
+                        eventTitle.setAttribute('style', item.titleStyle);
+                    }
+                });
+                    try {
+                        // إنشاء PDF من الصورة
+                        const { jsPDF } = window.jspdf;
+                        const doc = new jsPDF({
+                            orientation: 'landscape',
+                            unit: 'mm',
+                            format: 'a3' // استخدام حجم A3 بدلاً من A4 لتوفير مساحة أكبر
+                        });
+                        
+                        // تحميل دعم اللغة العربية
+                        try {
+                            // استخدام html2canvas لإنشاء الترويسة والتذييل
+                            const headerDiv = document.createElement('div');
+                            headerDiv.style.fontFamily = 'Cairo, sans-serif';
+                            headerDiv.style.textAlign = 'center';
+                            headerDiv.style.direction = 'rtl';
+                            headerDiv.style.width = '100%';
+                            headerDiv.style.padding = '10px';
+                            headerDiv.innerHTML = `
+                                <h2 style="margin: 0; color: #000; font-size: 18px;">التقويم المدرسي - ${schoolName}</h2>
+                                <p style="margin: 5px 0 0; font-size: 12px;">تاريخ الطباعة: ${new Date().toLocaleDateString('ar')}</p>
+                            `;
+                            document.body.appendChild(headerDiv);
+                            
+                            const footerDiv = document.createElement('div');
+                            footerDiv.style.fontFamily = 'Cairo, sans-serif';
+                            footerDiv.style.textAlign = 'center';
+                            footerDiv.style.direction = 'rtl';
+                            footerDiv.style.width = '100%';
+                            footerDiv.style.padding = '10px';
+                            footerDiv.innerHTML = `
+                                <p style="margin: 0; color: #000; font-size: 12px; font-weight: bold;">${schoolName}</p>
+                                ${schoolAddress ? `<p style="margin: 2px 0 0; color: #666; font-size: 10px;">${schoolAddress}</p>` : ''}
+                                ${schoolPhone ? `<p style="margin: 2px 0 0; color: #666; font-size: 10px;">هاتف: ${schoolPhone}</p>` : ''}
+                            `;
+                            document.body.appendChild(footerDiv);
+                            
+                            // تحويل الترويسة إلى صورة
+                            await html2canvas(headerDiv, { 
+                                scale: 2,
+                                useCORS: true,
+                                logging: false,
+                                backgroundColor: '#ffffff'
+                            }).then(headerCanvas => {
+                                const headerImgData = headerCanvas.toDataURL('image/png');
+                                const headerWidth = doc.internal.pageSize.getWidth() - 20;
+                                doc.addImage(headerImgData, 'PNG', 10, 10, headerWidth, 20);
+                                document.body.removeChild(headerDiv);
+                            });
+                            
+                            // إضافة صورة التقويم
+                            const imgData = canvas.toDataURL('image/jpeg', 1.0);
+                            const pageWidth = doc.internal.pageSize.getWidth();
+                            const pageHeight = doc.internal.pageSize.getHeight();
+                            const canvasRatio = canvas.height / canvas.width;
+                            
+                            // حساب الأبعاد المناسبة للصورة
+                            let imgWidth = pageWidth - 20;
+                            let imgHeight = imgWidth * canvasRatio;
+                            
+                            // التأكد من أن الصورة تناسب الصفحة
+                            if (imgHeight > pageHeight - 70) { // تعديل للسماح بمساحة أكبر للترويسة والتذييل
+                                imgHeight = pageHeight - 70;
+                                imgWidth = imgHeight / canvasRatio;
+                            }
+                            
+                            // إضافة الصورة في المنتصف
+                            const x = (pageWidth - imgWidth) / 2;
+                            doc.addImage(imgData, 'JPEG', x, 35, imgWidth, imgHeight);
+                            
+                            // تحويل التذييل إلى صورة
+                            await html2canvas(footerDiv, { 
+                                scale: 2,
+                                useCORS: true,
+                                logging: false,
+                                backgroundColor: '#ffffff'
+                            }).then(footerCanvas => {
+                                const footerImgData = footerCanvas.toDataURL('image/png');
+                                const footerWidth = doc.internal.pageSize.getWidth() - 20;
+                                doc.addImage(footerImgData, 'PNG', 10, pageHeight - 25, footerWidth, 20);
+                                document.body.removeChild(footerDiv);
+                            });
+                        } catch (error) {
+                            console.error('خطأ في إضافة الترويسة والتذييل:', error);
+                            // استخدام الطريقة القديمة كاحتياطي
+                            doc.setFont("Helvetica", "bold");
+                            doc.setFontSize(16);
+                            // لن نضيف نص عربي مباشرة لتجنب ظهور النص المشوه
+                        }
+                        
+                        // حفظ المستند
+                        const fileName = `التقويم_المدرسي_${schoolName.replace(/\s+/g, '_')}.pdf`;
+                        doc.save(fileName);
+                        showToast('تم تصدير التقويم بنجاح!');
+                    } catch (error) {
+                        console.error('خطأ في إنشاء PDF:', error);
+                        alert('حدث خطأ في إنشاء ملف PDF. يرجى المحاولة مرة أخرى.');
+                    }
+            } catch (error) {
+                console.error('خطأ في تصدير PDF:', error);
+                alert('حدث خطأ في تصدير PDF. يرجى المحاولة مرة أخرى.');
+            }
+        }
+
+        // دوال مساعدة
+        function getEventTypeText(type) {
+            const types = {
+                'exam': 'امتحان',
+                'activity': 'فعالية مدرسية',
+                'holiday': 'عطلة رسمية',
+                'meeting': 'اجتماع أولياء الأمور'
+            };
+            return types[type] || type;
+        }
+
+        function formatDate(date) {
+            return new Date(date).toLocaleDateString('ar-SA', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function formatDateForInput(date) {
+            return new Date(date).toISOString().split('T')[0];
+        }
+
+        function showToast(message) {
+            // تم إزالة وظيفة إظهار الرسالة
+            console.log(message);
+        }
+
+        // إغلاق modals عند النقر خارجها
+        document.addEventListener('click', function(e) {
+            const eventModal = document.getElementById('eventModal');
+            const addEventModal = document.getElementById('addEventModal');
+            
+            if (e.target === eventModal) {
+                closeEventModal();
+            }
+            if (e.target === addEventModal) {
+                closeAddEventModal();
+            }
+        });
+
+        // إغلاق modals عند الضغط على ESC
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeEventModal();
+                closeAddEventModal();
+            }
+        });
+        
+        // Horizontal Calendar Slider Functions
+        function initializeCalendarSlider() {
+            const scrollContainer = document.querySelector('.calendar-horizontal-scroll');
+            const scrollLeftBtn = document.getElementById('scrollLeftBtn');
+            const scrollRightBtn = document.getElementById('scrollRightBtn');
+            const leftIndicator = document.querySelector('.scroll-indicator-left');
+            const rightIndicator = document.querySelector('.scroll-indicator-right');
+            const mobileHint = document.querySelector('.mobile-scroll-hint');
+            
+            if (!scrollContainer) return;
+            
+            // Scroll button functionality
+            if (scrollLeftBtn) {
+                scrollLeftBtn.addEventListener('click', () => {
+                    scrollContainer.scrollBy({
+                        left: -300,
+                        behavior: 'smooth'
+                    });
+                });
+            }
+            
+            if (scrollRightBtn) {
+                scrollRightBtn.addEventListener('click', () => {
+                    scrollContainer.scrollBy({
+                        left: 300,
+                        behavior: 'smooth'
+                    });
+                });
+            }
+            
+            // Update scroll indicators
+            function updateScrollIndicators() {
+                const scrollLeft = scrollContainer.scrollLeft;
+                const maxScrollLeft = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+                
+                // Show/hide left indicator
+                if (scrollLeft > 0) {
+                    leftIndicator?.classList.add('show');
+                    scrollLeftBtn?.classList.add('show');
+                } else {
+                    leftIndicator?.classList.remove('show');
+                    scrollLeftBtn?.classList.remove('show');
+                }
+                
+                // Show/hide right indicator
+                if (scrollLeft < maxScrollLeft - 1) { // -1 for floating point precision
+                    rightIndicator?.classList.add('show');
+                    scrollRightBtn?.classList.add('show');
+                } else {
+                    rightIndicator?.classList.remove('show');
+                    scrollRightBtn?.classList.remove('show');
+                }
+            }
+            
+            // Touch gesture handling
+            let isScrolling = false;
+            let startX = 0;
+            let startY = 0;
+            let scrollLeft = 0;
+            
+            scrollContainer.addEventListener('touchstart', (e) => {
+                isScrolling = true;
+                startX = e.touches[0].pageX - scrollContainer.offsetLeft;
+                startY = e.touches[0].pageY - scrollContainer.offsetTop;
+                scrollLeft = scrollContainer.scrollLeft;
+                
+                // Hide mobile hint after first touch
+                if (mobileHint) {
+                    mobileHint.style.opacity = '0';
+                    setTimeout(() => {
+                        mobileHint.style.display = 'none';
+                    }, 300);
+                }
+            });
+            
+            scrollContainer.addEventListener('touchmove', (e) => {
+                if (!isScrolling) return;
+                
+                e.preventDefault();
+                const x = e.touches[0].pageX - scrollContainer.offsetLeft;
+                const y = e.touches[0].pageY - scrollContainer.offsetTop;
+                const walkX = (x - startX) * 2; // Scroll speed multiplier
+                const walkY = Math.abs(y - startY);
+                
+                // Only scroll horizontally if the horizontal movement is greater than vertical
+                if (walkX > walkY) {
+                    scrollContainer.scrollLeft = scrollLeft - walkX;
+                }
+            });
+            
+            scrollContainer.addEventListener('touchend', () => {
+                isScrolling = false;
+            });
+            
+            // Mouse drag functionality for desktop
+            let isMouseDown = false;
+            let mouseStartX = 0;
+            let mouseScrollLeft = 0;
+            
+            scrollContainer.addEventListener('mousedown', (e) => {
+                isMouseDown = true;
+                scrollContainer.style.cursor = 'grabbing';
+                mouseStartX = e.pageX - scrollContainer.offsetLeft;
+                mouseScrollLeft = scrollContainer.scrollLeft;
+            });
+            
+            scrollContainer.addEventListener('mousemove', (e) => {
+                if (!isMouseDown) return;
+                e.preventDefault();
+                const x = e.pageX - scrollContainer.offsetLeft;
+                const walk = (x - mouseStartX) * 2;
+                scrollContainer.scrollLeft = mouseScrollLeft - walk;
+            });
+            
+            scrollContainer.addEventListener('mouseup', () => {
+                isMouseDown = false;
+                scrollContainer.style.cursor = 'grab';
+            });
+            
+            scrollContainer.addEventListener('mouseleave', () => {
+                isMouseDown = false;
+                scrollContainer.style.cursor = 'grab';
+            });
+            
+            // Set initial cursor style
+            scrollContainer.style.cursor = 'grab';
+            
+            // Keyboard navigation
+            scrollContainer.addEventListener('keydown', (e) => {
+                switch(e.key) {
+                    case 'ArrowLeft':
+                        e.preventDefault();
+                        scrollContainer.scrollBy({
+                            left: -100,
+                            behavior: 'smooth'
+                        });
+                        break;
+                    case 'ArrowRight':
+                        e.preventDefault();
+                        scrollContainer.scrollBy({
+                            left: 100,
+                            behavior: 'smooth'
+                        });
+                        break;
+                }
+            });
+            
+            // Make container focusable for keyboard navigation
+            scrollContainer.setAttribute('tabindex', '0');
+            
+            // Update indicators on scroll
+            scrollContainer.addEventListener('scroll', updateScrollIndicators);
+            
+            // Initial update
+            updateScrollIndicators();
+            
+            // Update on window resize
+            window.addEventListener('resize', () => {
+                setTimeout(updateScrollIndicators, 100);
+            });
+            
+            // Auto-hide mobile hint after 5 seconds
+            if (mobileHint && window.innerWidth <= 768) {
+                setTimeout(() => {
+                    mobileHint.style.opacity = '0';
+                    setTimeout(() => {
+                        mobileHint.style.display = 'none';
+                    }, 300);
+                }, 5000);
+            }
+        }
+        
+        // إضافة معالج الحدث لزر تصدير PDF
+        document.addEventListener('DOMContentLoaded', function() {
+            const exportBtn = document.getElementById('exportPdfBtn');
+            if (exportBtn) {
+                exportBtn.addEventListener('click', function() {
+                    try {
+                        exportToPDF();
+                    } catch (error) {
+                        console.error('خطأ في تصدير PDF:', error);
+                        alert('حدث خطأ في تصدير PDF. يرجى المحاولة مرة أخرى.');
+                    }
+                });
+            }
+            
+            // Initialize Horizontal Calendar Slider
+            initializeCalendarSlider();
+            
+            // Typing Effect Enhancement
+            const typingText = document.querySelector('.typing-text');
+            if (typingText && window.innerWidth > 768) {
+                const text = typingText.textContent;
+                typingText.textContent = '';
+                let i = 0;
+                
+                function typeWriter() {
+                    if (i < text.length) {
+                        typingText.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, 100);
+                    }
+                }
+                
+                // Start typing after a delay
+                setTimeout(typeWriter, 500);
+            }
+            
+            // Button Hover Effects
+            const ctaButton = document.querySelector('a[href="#calendar-content"]');
+            if (ctaButton) {
+                ctaButton.addEventListener('mouseenter', () => {
+                    ctaButton.style.boxShadow = '0 20px 40px rgba(255, 193, 7, 0.4)';
+                });
+                
+                ctaButton.addEventListener('mouseleave', () => {
+                    ctaButton.style.boxShadow = '';
+                });
+            }
+            
+            // Smooth Scroll for Navigation Links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+            
+            
+        });
+    </script>
+</body>
+</html> 

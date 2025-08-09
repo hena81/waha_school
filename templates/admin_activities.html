@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة معرض الأنشطة المدرسية - المشرف</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Lightbox CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet">
+    <!-- Video.js CSS -->
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet">
+    <style>
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+        }
+        
+        .activity-card {
+            transition: all 0.3s ease;
+        }
+        
+        .activity-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .image-container {
+            overflow: hidden;
+        }
+        
+        .image-container img {
+            transition: transform 0.3s ease;
+        }
+        
+        .image-container:hover img {
+            transform: scale(1.1);
+        }
+        
+        .play-button {
+            transition: all 0.3s ease;
+        }
+        
+        .play-button:hover {
+            transform: scale(1.1);
+        }
+        
+        .delete-button {
+            transition: all 0.2s ease;
+        }
+        
+        .delete-button:hover {
+            transform: scale(1.1);
+            background-color: #ef4444;
+        }
+        
+        .filter-button {
+            transition: all 0.2s ease;
+        }
+        
+        .filter-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Typing Effect */
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink {
+            0%, 50% { border-color: transparent; }
+            51%, 100% { border-color: #fbbf24; }
+        }
+
+        .typing-text {
+            white-space: nowrap;
+            border-right: 3px solid #fbbf24;
+            animation: typing 3s steps(40, end), blink 0.75s step-end infinite;
+        }
+
+        /* CTA Button */
+        .cta-button {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Hover Glow Effect */
+        .hover-glow:hover {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+
+        /* Glass Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Responsive Typing */
+        @media (max-width: 768px) {
+            .typing-text {
+                animation: none;
+                border-right: none;
+                white-space: normal;
+            }
+        }
+
+                 /* Animation delay for activity cards */
+         .activity-card[data-animation-delay] {
+             animation-delay: calc(var(--animation-delay, 0) * 0.1s);
+         }
+         
+         /* Line clamp utilities */
+         .line-clamp-2 {
+             display: -webkit-box;
+             -webkit-line-clamp: 2;
+             line-clamp: 2;
+             -webkit-box-orient: vertical;
+             overflow: hidden;
+         }
+    </style>
+</head>
+<body class="font-['Cairo'] bg-gradient-to-br from-blue-50 to-green-100 min-h-screen">
+    <!-- Header & Hero Section -->
+    <section class="bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900 text-white relative overflow-hidden">
+        <!-- Header Navigation -->
+        <div class="relative z-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-32 md:h-36 lg:h-40">
+                    <div class="flex items-center flex-shrink-0">
+                        {% if school_settings and school_settings.school_logo %}
+                            <img src="/assets/images/{{ school_settings.school_logo }}" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto">
+                        {% else %}
+                            <img src="/assets/images/logo.png" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto">
+                        {% endif %}
+                    </div>
+                    <div class="flex-1 flex justify-center">
+                        <span class="text-base md:text-3xl font-extrabold text-yellow-400 tracking-wide font-['Cairo','Noto Kufi Arabic',sans-serif] select-none">
+                            {% if school_settings and school_settings.school_name %}
+                                {{ school_settings.school_name }}
+                            {% else %}
+                                سجل بيانات المدرسة من الاعدادات
+                            {% endif %}
+                        </span>
+                    </div>
+                    <!-- روابط للشاشات الكبيرة -->
+                    <div class="hidden md:flex items-center space-x-2 space-x-reverse">
+                        <a href="/admin" class="px-2 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition">لوحة التحكم</a>
+                        <a href="/logout" class="px-2 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition">تسجيل الخروج</a>
+                    </div>
+                    <!-- زر للشاشات الصغيرة -->
+                    <div class="md:hidden">
+                        <button onclick="toggleMobileMenu()" class="px-3 py-2 rounded-md text-white bg-white/10 hover:bg-white/20 focus:outline-none transition">
+                            <i class="fas fa-bars"></i>
+                        </button>
+                        <!-- قائمة منسدلة للشاشات الصغيرة -->
+                        <div id="mobileMenu" class="hidden absolute left-0 mt-2 w-48 rounded-md shadow-lg glass ring-1 ring-white/20 py-1 z-40 relative border-t border-white/10" style="top: 4rem; left: 1rem;">
+                            <a href="/admin" class="block px-4 py-2 text-sm text-white/90 hover:bg-white/10">لوحة التحكم</a>
+                            <a href="/logout" class="block px-4 py-2 text-sm text-white/90 hover:bg-white/10">تسجيل الخروج</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hero Content -->
+        <div class="relative z-10 pb-32">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+                <div class="text-center">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-6 typing-text mt-16">
+                        إدارة معرض الأنشطة المدرسية
+                    </h1>
+                    <p class="text-xl md:text-2xl text-white/90 mb-8 max-w-3xl mx-auto mt-8">
+                        إضافة وإدارة الأنشطة والفعاليات المدرسية بسهولة وكفاءة
+                    </p>
+                    <button class="cta-button bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-8 py-4 rounded-full text-lg font-bold hover-glow transition-all duration-300">
+                        <i class="fas fa-plus ml-2"></i>
+                        إضافة نشاط جديد
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- أيقونة الرئيسية -->
+    <div class="fixed left-4 top-1/2 transform -translate-y-1/2 z-50">
+        <a href="/admin" class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl">
+            <i class="fas fa-home text-xl"></i>
+        </a>
+    </div>
+
+    <div class="container mx-auto px-4 py-8">
+        <div class="max-w-7xl mx-auto">
+            <!-- نموذج إضافة نشاط جديد -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+                <h2 class="text-xl font-bold text-gray-800 mb-4">إضافة نشاط جديد</h2>
+                
+                <form id="activityForm" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">اسم النشاط *</label>
+                            <input type="text" name="name" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="مثال: حفل التخرج 2024">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">تاريخ النشاط *</label>
+                            <input type="date" name="activity_date" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">وصف مختصر *</label>
+                        <textarea name="description" required rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none" placeholder="وصف مختصر للنشاط..."></textarea>
+                    </div>
+                    
+                    <!-- منطقة رفع الملفات -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">رفع الوسائط *</label>
+                        <div id="fileUploadArea" class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors cursor-pointer bg-gray-50">
+                            <div class="space-y-2">
+                                <i class="fas fa-cloud-upload-alt text-4xl text-gray-400"></i>
+                                <p class="text-lg font-medium text-gray-700">اسحب وأفلت الملفات هنا</p>
+                                <p class="text-sm text-gray-500">أو انقر لاختيار الملفات</p>
+                                <p class="text-xs text-gray-400">الصور: JPG, PNG | الفيديو: MP4, AVI, MOV</p>
+                            </div>
+                            <input type="file" id="fileInput" multiple accept=".jpg,.jpeg,.png,.mp4,.avi,.mov" class="hidden">
+                        </div>
+                    </div>
+                    
+                    <!-- معاينة الملفات -->
+                    <div id="filePreview" class="hidden">
+                        <h3 class="text-lg font-medium text-gray-700 mb-3">معاينة الملفات المحددة</h3>
+                        <div id="fileList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <!-- سيتم إضافة الملفات هنا ديناميكياً -->
+                        </div>
+                    </div>
+                    
+                    <!-- شريط التقدم -->
+                    <div id="uploadProgress" class="hidden">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-sm font-medium text-gray-700">جاري رفع الملفات...</span>
+                            <span id="progressPercent" class="text-sm text-gray-500">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div id="progressBar" class="bg-blue-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-end">
+                        <button type="submit" id="submitBtn" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 filter-button flex items-center">
+                            <i class="fas fa-upload ml-2"></i>
+                            رفع النشاط
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- معرض الأنشطة -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-bold text-gray-800">معرض الأنشطة ({{ activities|length }} نشاط)</h3>
+                                         <div class="flex items-center space-x-2 space-x-reverse">
+                         {% if activities|length > 0 and session.role == 'مشرف' %}
+                         <button onclick="deleteAllActivities()" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center">
+                             <i class="fas fa-trash ml-2"></i>
+                             حذف جميع الأنشطة
+                         </button>
+                         {% endif %}
+                     </div>
+                </div>
+                
+                {% if activities %}
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {% for activity in activities %}
+                    <div class="bg-gray-50 rounded-lg overflow-hidden shadow-md activity-card animate-fade-in-up" data-animation-delay="{{ loop.index * 0.1 }}">
+                        <!-- الصورة المصغرة -->
+                        <div class="relative bg-gray-200 image-container" style="height: 200px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                            {% if activity.media %}
+                                {% set primary_media = activity.media|selectattr('is_primary', 'equalto', true)|first %}
+                                {% if not primary_media %}
+                                    {% set primary_media = activity.media|first %}
+                                {% endif %}
+                                
+                                {% if primary_media.media_type == 'صورة' %}
+                                    <a href="/assets/activities/{{ primary_media.file_path }}" data-lightbox="activities" data-title="{{ activity.name }}" class="block w-full h-full flex items-center justify-center">
+                                        <img src="/assets/activities/{{ primary_media.file_path }}" alt="{{ activity.name }}" style="max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain;">
+                                    </a>
+                                {% else %}
+                                    {% if primary_media.thumbnail_path %}
+                                        <img src="/assets/activities/{{ primary_media.thumbnail_path }}" alt="{{ activity.name }}" style="max-width: 100%; max-height: 100%; width: auto; height: auto; object-fit: contain;">
+                                    {% else %}
+                                        <div class="w-full h-full flex items-center justify-center bg-gray-300">
+                                            <i class="fas fa-play-circle text-4xl text-gray-600"></i>
+                                        </div>
+                                    {% endif %}
+                                    <button data-video-path="{{ primary_media.file_path }}" data-video-title="{{ activity.name }}" class="play-video-btn absolute inset-0 w-full h-full">
+                                        <!-- إزالة زر التشغيل - الفيديو سيعرض مباشرة -->
+                                    </button>
+                                {% endif %}
+                                
+                                <!-- عدد الوسائط -->
+                                {% if activity.media|length > 1 %}
+                                <div class="absolute bottom-2 right-2 bg-black bg-opacity-75 text-white px-2 py-1 rounded text-xs">
+                                    +{{ activity.media|length - 1 }} ملفات أخرى
+                                </div>
+                                {% endif %}
+                            {% else %}
+                                <div class="w-full h-full flex items-center justify-center bg-gray-300">
+                                    <i class="fas fa-image text-4xl text-gray-600"></i>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- زر الحذف -->
+                            {% if session.role == 'مشرف' or session.role == 'مشرف محتوى' %}
+                            <button data-activity-id="{{ activity.id }}" data-activity-name="{{ activity.name }}" class="delete-activity-btn absolute top-2 left-2 bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center delete-button">
+                                <i class="fas fa-trash text-sm"></i>
+                            </button>
+                            {% endif %}
+                            
+                            <!-- نوع الوسائط -->
+                            {% if activity.media %}
+                            <div class="absolute top-2 right-2 bg-black bg-opacity-50 text-white px-2 py-1 rounded text-xs">
+                                {% set image_count = activity.media|selectattr('media_type', 'equalto', 'صورة')|list|length %}
+                                {% set video_count = activity.media|selectattr('media_type', 'equalto', 'فيديو')|list|length %}
+                                {% if image_count > 0 and video_count > 0 %}
+                                    📷 {{ image_count }} 🎥 {{ video_count }}
+                                {% elif image_count > 0 %}
+                                    📷 {{ image_count }} صور
+                                {% elif video_count > 0 %}
+                                    🎥 {{ video_count }} فيديو
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                                                 <!-- معلومات النشاط -->
+                         <div class="p-4">
+                             <h4 class="font-bold text-gray-800 mb-1">{{ activity.name }}</h4>
+                             <p class="text-sm text-gray-600 mb-2">{{ activity.description[:100] }}{% if activity.description|length > 100 %}...{% endif %}</p>
+                             <div class="flex items-center justify-between text-xs text-gray-500">
+                                 <span>{{ activity.activity_date.strftime('%Y-%m-%d') }}</span>
+                                 <span>{{ activity.upload_date.strftime('%H:%M') }}</span>
+                             </div>
+                            
+                            <!-- زر عرض جميع الوسائط -->
+                            {% if activity.media and activity.media|length > 1 %}
+                            <div class="mt-3">
+                                <button data-activity-id="{{ activity.id }}" data-activity-name="{{ activity.name }}" class="show-activity-media-btn w-full px-3 py-1 bg-blue-500 text-white rounded text-xs hover:bg-blue-600 transition-colors">
+                                    <i class="fas fa-images ml-1"></i>
+                                    عرض جميع الوسائط ({{ activity.media|length }})
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-12">
+                    <i class="fas fa-images text-6xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-500 text-lg">لا توجد أنشطة مسجلة بعد</p>
+                    <p class="text-gray-400">ابدأ برفع نشاط جديد من النموذج أعلاه</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal مشغل الفيديو -->
+    <div id="videoModal" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50 flex items-center justify-center p-0">
+        <div class="bg-white rounded-lg w-full h-full max-w-none max-h-none overflow-hidden flex flex-col">
+            <div class="flex items-center justify-between p-4 border-b bg-gray-50 flex-shrink-0">
+                <h3 id="videoTitle" class="text-lg font-bold text-gray-800"></h3>
+                <button onclick="closeVideoModal()" class="text-gray-500 hover:text-gray-700 transition-colors duration-200">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="bg-black flex-1 p-0">
+                <div id="videoContainer" class="w-full h-full">
+                    <!-- سيتم إنشاء عنصر الفيديو هنا ديناميكياً -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal عرض جميع وسائط النشاط -->
+    <div id="activityMediaModal" class="fixed inset-0 bg-black bg-opacity-75 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col">
+            <div class="flex items-center justify-between p-4 border-b bg-gray-50 flex-shrink-0">
+                <h3 id="activityMediaTitle" class="text-lg font-bold text-gray-800"></h3>
+                <button onclick="closeActivityMediaModal()" class="text-gray-500 hover:text-gray-700 transition-colors duration-200">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6">
+                <div id="activityMediaContent" class="space-y-4">
+                    <!-- سيتم إضافة المحتوى هنا ديناميكياً -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+    
+    <script>
+        // متغيرات عامة
+        let selectedFiles = [];
+        let currentActivityId = null;
+        let currentActivityMedia = [];
+
+        // تهيئة الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeFileUpload();
+            initializeActivityCards();
+        });
+
+        // تهيئة رفع الملفات
+        function initializeFileUpload() {
+            const fileUploadArea = document.getElementById('fileUploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const filePreview = document.getElementById('filePreview');
+            const fileList = document.getElementById('fileList');
+            const activityForm = document.getElementById('activityForm');
+
+            // النقر على منطقة الرفع
+            fileUploadArea.addEventListener('click', () => fileInput.click());
+
+            // تغيير الملفات المحددة
+            fileInput.addEventListener('change', handleFileSelection);
+
+            // Drag & Drop
+            fileUploadArea.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                fileUploadArea.classList.add('border-blue-400', 'bg-blue-50');
+            });
+
+            fileUploadArea.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                fileUploadArea.classList.remove('border-blue-400', 'bg-blue-50');
+            });
+
+            fileUploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                fileUploadArea.classList.remove('border-blue-400', 'bg-blue-50');
+                
+                const files = Array.from(e.dataTransfer.files);
+                handleFiles(files);
+            });
+
+            // إرسال النموذج
+            activityForm.addEventListener('submit', handleFormSubmit);
+        }
+
+        // معالجة اختيار الملفات
+        function handleFileSelection(e) {
+            const files = Array.from(e.target.files);
+            handleFiles(files);
+        }
+
+        // معالجة الملفات
+        function handleFiles(files) {
+            const validFiles = files.filter(file => {
+                const extension = file.name.split('.').pop().toLowerCase();
+                const allowedExtensions = ['jpg', 'jpeg', 'png', 'mp4', 'avi', 'mov'];
+                return allowedExtensions.includes(extension);
+            });
+
+            if (validFiles.length === 0) {
+                alert('يرجى اختيار ملفات صحيحة (JPG, PNG, MP4, AVI, MOV)');
+                return;
+            }
+
+            selectedFiles = validFiles;
+            displayFilePreview();
+        }
+
+        // عرض معاينة الملفات
+        function displayFilePreview() {
+            const filePreview = document.getElementById('filePreview');
+            const fileList = document.getElementById('fileList');
+            
+            if (selectedFiles.length === 0) {
+                filePreview.classList.add('hidden');
+                return;
+            }
+
+            filePreview.classList.remove('hidden');
+            fileList.innerHTML = '';
+
+            selectedFiles.forEach((file, index) => {
+                const fileCard = createFilePreviewCard(file, index);
+                fileList.appendChild(fileCard);
+            });
+        }
+
+        // إنشاء بطاقة معاينة الملف
+        function createFilePreviewCard(file, index) {
+            const card = document.createElement('div');
+            card.className = 'bg-gray-50 rounded-lg p-4 border border-gray-200';
+            
+            const extension = file.name.split('.').pop().toLowerCase();
+            const isImage = ['jpg', 'jpeg', 'png'].includes(extension);
+            const isVideo = ['mp4', 'avi', 'mov'].includes(extension);
+            
+            let previewContent = '';
+            if (isImage) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    card.querySelector('.file-preview').innerHTML = `
+                        <img src="${e.target.result}" alt="${file.name}" class="w-full h-32 object-cover rounded">
+                    `;
+                };
+                reader.readAsDataURL(file);
+                previewContent = '<div class="file-preview w-full h-32 bg-gray-200 rounded flex items-center justify-center"><i class="fas fa-image text-2xl text-gray-400"></i></div>';
+            } else if (isVideo) {
+                previewContent = `
+                    <div class="file-preview w-full h-32 bg-gray-200 rounded flex items-center justify-center">
+                        <i class="fas fa-video text-2xl text-gray-400"></i>
+                    </div>
+                `;
+            }
+
+            card.innerHTML = `
+                ${previewContent}
+                <div class="mt-3">
+                    <p class="text-sm font-medium text-gray-800 truncate">${file.name}</p>
+                    <p class="text-xs text-gray-500">${formatFileSize(file.size)}</p>
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="text-xs px-2 py-1 rounded ${isImage ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}">
+                            ${isImage ? '📷 صورة' : '🎥 فيديو'}
+                        </span>
+                        <button onclick="removeFile(${index})" class="text-red-500 hover:text-red-700">
+                            <i class="fas fa-trash text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        // إزالة ملف من القائمة
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            displayFilePreview();
+        }
+
+        // تنسيق حجم الملف
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // معالجة إرسال النموذج
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+
+            if (selectedFiles.length === 0) {
+                alert('يرجى اختيار ملفات للرفع');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('name', document.querySelector('input[name="name"]').value);
+            formData.append('description', document.querySelector('textarea[name="description"]').value);
+            formData.append('activity_date', document.querySelector('input[name="activity_date"]').value);
+
+            selectedFiles.forEach(file => {
+                formData.append('files[]', file);
+            });
+
+            // عرض شريط التقدم
+            const progressDiv = document.getElementById('uploadProgress');
+            const progressBar = document.getElementById('progressBar');
+            const progressPercent = document.getElementById('progressPercent');
+            const submitBtn = document.getElementById('submitBtn');
+
+            progressDiv.classList.remove('hidden');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin ml-2"></i>جاري الرفع...';
+
+            try {
+                const response = await fetch('/admin/activities/upload_multiple', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert(result.message);
+                    location.reload();
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                alert('حدث خطأ أثناء رفع الملفات');
+                console.error(error);
+            } finally {
+                progressDiv.classList.add('hidden');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-upload ml-2"></i>رفع النشاط';
+            }
+        }
+
+        // تهيئة بطاقات الأنشطة
+        function initializeActivityCards() {
+            // إضافة event listeners لأزرار الحذف
+            const deleteButtons = document.querySelectorAll('.delete-activity-btn');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const activityId = this.getAttribute('data-activity-id');
+                    const activityName = this.getAttribute('data-activity-name');
+                    deleteActivity(activityId, activityName);
+                });
+            });
+
+            // إضافة event listeners لأزرار تشغيل الفيديو
+            const playVideoButtons = document.querySelectorAll('.play-video-btn');
+            playVideoButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const videoPath = this.getAttribute('data-video-path');
+                    const videoTitle = this.getAttribute('data-video-title');
+                    playVideo(videoPath, videoTitle);
+                });
+            });
+
+            // إضافة event listeners لأزرار عرض وسائط النشاط
+            const showActivityMediaButtons = document.querySelectorAll('.show-activity-media-btn');
+            showActivityMediaButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const activityId = this.getAttribute('data-activity-id');
+                    const activityName = this.getAttribute('data-activity-name');
+                    showActivityMedia(activityId, activityName);
+                });
+            });
+        }
+
+        // عرض جميع وسائط النشاط
+        async function showActivityMedia(activityId, activityName) {
+            console.log('=== بداية showActivityMedia ===');
+            console.log('activityId:', activityId);
+            console.log('activityName:', activityName);
+            
+            currentActivityId = activityId;
+            console.log('تم تعيين currentActivityId:', currentActivityId);
+            
+            try {
+                const url = `/admin/activities/${activityId}/media`;
+                console.log('جاري إرسال طلب إلى:', url);
+                
+                const response = await fetch(url);
+                console.log('استجابة الخادم:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('نتيجة الطلب:', result);
+                
+                if (result.success) {
+                    currentActivityMedia = result.media;
+                    console.log('تم تعيين currentActivityMedia:', currentActivityMedia);
+                    console.log('عدد الوسائط:', currentActivityMedia.length);
+                    
+                    displayActivityMedia(activityName, result.media);
+                } else {
+                    alert(result.message);
+                    console.error('فشل في جلب الوسائط:', result.message);
+                }
+            } catch (error) {
+                console.error('خطأ في جلب وسائط النشاط:', error);
+                alert('حدث خطأ في جلب وسائط النشاط: ' + error.message);
+            }
+        }
+
+        // عرض وسائط النشاط في Modal
+        function displayActivityMedia(activityName, media) {
+            const modal = document.getElementById('activityMediaModal');
+            const title = document.getElementById('activityMediaTitle');
+            const content = document.getElementById('activityMediaContent');
+
+            title.textContent = `وسائط النشاط: ${activityName}`;
+            content.innerHTML = '';
+
+            media.forEach((item, index) => {
+                const mediaCard = createMediaCard(item, index);
+                content.appendChild(mediaCard);
+            });
+
+            modal.classList.remove('hidden');
+        }
+
+        // إنشاء بطاقة الوسائط
+        function createMediaCard(media, index) {
+            const card = document.createElement('div');
+            card.className = 'bg-gray-50 rounded-lg p-4 border border-gray-200';
+            card.setAttribute('data-media-id', media.id);
+
+            let mediaContent = '';
+            if (media.media_type === 'صورة') {
+                mediaContent = `
+                    <img src="/assets/activities/${media.file_path}" alt="${media.file_name}" 
+                         class="w-full h-48 object-cover rounded cursor-pointer" 
+                         onclick="openImageModal('/assets/activities/${media.file_path}', '${media.file_name}')">
+                `;
+            } else {
+                mediaContent = `
+                    <div class="relative w-full h-48 bg-gray-200 rounded flex items-center justify-center">
+                        ${media.thumbnail_path ? 
+                            `<img src="/assets/activities/${media.thumbnail_path}" alt="${media.file_name}" class="w-full h-full object-cover rounded">` :
+                            '<i class="fas fa-video text-4xl text-gray-400"></i>'
+                        }
+                        <button onclick="playVideo('${media.file_path}', '${media.file_name}')" 
+                                class="absolute inset-0 w-full h-full flex items-center justify-center bg-black bg-opacity-30 hover:bg-opacity-50 transition-all">
+                            <i class="fas fa-play-circle text-4xl text-white"></i>
+                        </button>
+                    </div>
+                `;
+            }
+
+            card.innerHTML = `
+                ${mediaContent}
+                <div class="mt-3">
+                    <p class="text-sm font-medium text-gray-800 truncate">${media.file_name}</p>
+                    <div class="flex items-center justify-between mt-2">
+                        <span class="text-xs px-2 py-1 rounded ${media.media_type === 'صورة' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}">
+                            ${media.media_type === 'صورة' ? '📷 صورة' : '🎥 فيديو'}
+                        </span>
+                        <div class="flex items-center space-x-2 space-x-reverse">
+                            <button onclick="console.log('تم الضغط على زر تعيين كرئيسية للوسائط:', ${media.id}); setPrimaryMedia(${media.id})" 
+                                    class="text-xs px-2 py-1 rounded ${media.is_primary ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}">
+                                ${media.is_primary ? '⭐ رئيسية' : 'تعيين كرئيسية'}
+                            </button>
+                            <button onclick="deleteMedia(${media.id})" class="text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        // إغلاق modal الوسائط
+        function closeActivityMediaModal() {
+            const modal = document.getElementById('activityMediaModal');
+            modal.classList.add('hidden');
+            currentActivityId = null;
+            currentActivityMedia = [];
+        }
+
+        // تعيين وسائط كرئيسية
+        async function setPrimaryMedia(mediaId) {
+            console.log('=== بداية setPrimaryMedia ===');
+            console.log('mediaId:', mediaId);
+            console.log('نوع mediaId:', typeof mediaId);
+            console.log('currentActivityId:', currentActivityId);
+            console.log('نوع currentActivityId:', typeof currentActivityId);
+            console.log('currentActivityMedia:', currentActivityMedia);
+            console.log('نوع currentActivityMedia:', typeof currentActivityMedia);
+            console.log('طول currentActivityMedia:', currentActivityMedia ? currentActivityMedia.length : 'غير معرف');
+            
+            // التحقق من البيانات
+            if (!currentActivityId) {
+                alert('خطأ: معرف النشاط غير موجود');
+                console.error('currentActivityId غير موجود');
+                return;
+            }
+            
+            if (!currentActivityMedia || currentActivityMedia.length === 0) {
+                alert('خطأ: قائمة الوسائط فارغة');
+                console.error('currentActivityMedia فارغ أو غير معرف');
+                return;
+            }
+            
+            // التحقق من وجود mediaId في القائمة
+            const mediaExists = currentActivityMedia.some(m => m.id == mediaId);
+            console.log('هل mediaId موجود في القائمة:', mediaExists);
+            
+            if (!mediaExists) {
+                alert('خطأ: الوسائط المحددة غير موجودة في قائمة النشاط');
+                console.error('mediaId غير موجود في currentActivityMedia');
+                return;
+            }
+            
+            try {
+                const requestData = {
+                    activity_id: currentActivityId,
+                    primary_media_id: mediaId,
+                    media_order: currentActivityMedia.map(m => m.id)
+                };
+                
+                console.log('بيانات الطلب:', requestData);
+                console.log('JSON stringified:', JSON.stringify(requestData));
+                
+                const response = await fetch('/admin/activities/reorder_media', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(requestData)
+                });
+
+                console.log('استجابة الخادم:', response);
+                console.log('حالة الاستجابة:', response.status);
+                console.log('نص الاستجابة:', response.statusText);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                console.log('نتيجة الطلب:', result);
+                
+                if (result.success) {
+                    alert('تم تعيين الوسائط كرئيسية بنجاح');
+                    console.log('تم التعيين بنجاح، إعادة تحميل الصفحة...');
+                    location.reload();
+                } else {
+                    alert(result.message || 'حدث خطأ في تعيين الوسائط الرئيسية');
+                    console.error('فشل في التعيين:', result.message);
+                }
+            } catch (error) {
+                console.error('خطأ في تعيين الوسائط الرئيسية:', error);
+                console.error('تفاصيل الخطأ:', error.message);
+                alert('حدث خطأ في تحديث الوسائط الرئيسية: ' + error.message);
+            }
+        }
+
+        // حذف وسائط
+        async function deleteMedia(mediaId) {
+            if (!confirm('هل أنت متأكد من حذف هذه الوسائط؟')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/admin/activities/delete_media/${mediaId}`, {
+                    method: 'POST'
+                });
+
+                const result = await response.json();
+                if (result.success) {
+                    if (result.activity_deleted) {
+                        location.reload();
+                    } else {
+                        // إزالة البطاقة من الواجهة
+                        const mediaCard = document.querySelector(`[data-media-id="${mediaId}"]`);
+                        if (mediaCard) {
+                            mediaCard.remove();
+                        }
+                    }
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                alert('حدث خطأ في حذف الوسائط');
+                console.error(error);
+            }
+        }
+
+        // تبديل عرض القائمة المنسدلة للجوال
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('hidden');
+        }
+        
+        // إغلاق القائمة عند النقر خارجها والضغط على ESC
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileMenuButton = event.target.closest('button[onclick="toggleMobileMenu()"]');
+            
+            if (!mobileMenu.contains(event.target) && !mobileMenuButton) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const mobileMenu = document.getElementById('mobileMenu');
+                mobileMenu.classList.add('hidden');
+                closeActivityMediaModal();
+            }
+        });
+
+        // Typing Effect
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set animation delays for activity cards
+            const activityCards = document.querySelectorAll('.activity-card[data-animation-delay]');
+            activityCards.forEach(card => {
+                const delay = card.getAttribute('data-animation-delay');
+                card.style.setProperty('--animation-delay', delay);
+            });
+
+            const typingText = document.querySelector('.typing-text');
+            if (typingText) {
+                const text = typingText.textContent;
+                typingText.textContent = '';
+                
+                let i = 0;
+                const typeWriter = () => {
+                    if (i < text.length) {
+                        typingText.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, 100);
+                    }
+                };
+                typeWriter();
+            }
+
+            // CTA Button hover effects
+            const ctaButton = document.querySelector('.cta-button');
+            if (ctaButton) {
+                ctaButton.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px) scale(1.05)';
+                });
+                
+                ctaButton.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            }
+        });
+        
+        // تهيئة Lightbox
+        lightbox.option({
+            'resizeDuration': 200,
+            'wrapAround': true,
+            'albumLabel': 'صورة %1 من %2'
+        });
+
+        // تهيئة مشغل الفيديو
+        let player = null;
+
+        function playVideo(videoPath, title) {
+            const modal = document.getElementById('videoModal');
+            const videoTitle = document.getElementById('videoTitle');
+            const videoContainer = document.getElementById('videoContainer');
+            
+            videoTitle.textContent = title;
+            modal.classList.remove('hidden');
+
+            // إزالة أي عنصر فيديو سابق
+            videoContainer.innerHTML = '';
+            
+            // إنشاء عنصر فيديو جديد
+            const newVideo = document.createElement('video');
+            newVideo.id = 'videoPlayer';
+            newVideo.className = 'video-js vjs-default-skin';
+            newVideo.setAttribute('controls', '');
+            newVideo.setAttribute('preload', 'auto');
+            newVideo.setAttribute('autoplay', '');
+            newVideo.setAttribute('muted', '');
+            newVideo.style.width = '100%';
+            newVideo.style.height = '100%';
+            videoContainer.appendChild(newVideo);
+
+            // تهيئة Video.js
+            window.player = videojs('videoPlayer', {
+                controls: true,
+                autoplay: true,
+                preload: 'auto',
+                fluid: false,
+                responsive: false,
+                muted: true,
+                width: '100%',
+                height: '100%',
+                playbackRates: [0.5, 1, 1.25, 1.5, 2]
+            });
+            window.player.src({
+                src: `/assets/activities/${videoPath}`,
+                type: 'video/mp4'
+            });
+            
+            // إزالة كتم الصوت بعد التحميل
+            window.player.ready(function() {
+                window.player.muted(false);
+            });
+        }
+
+        function closeVideoModal() {
+            const closeModal = document.getElementById('videoModal');
+            closeModal.classList.add('hidden');
+            
+            if (window.player) {
+                window.player.pause();
+                window.player.dispose();
+                window.player = null;
+            }
+            
+            // إزالة عنصر الفيديو
+            const closeVideoContainer = document.getElementById('videoContainer');
+            closeVideoContainer.innerHTML = '';
+        }
+
+        function deleteActivity(activityId, activityName) {
+            if (confirm(`هل أنت متأكد من حذف النشاط "${activityName}"؟`)) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `/admin/activities/delete/${activityId}`;
+                document.body.appendChild(form);
+                form.submit();
+            }
+        }
+        
+        function deleteAllActivities() {
+            if (confirm(`هل أنت متأكد من حذف جميع الأنشطة؟ لا يمكن التراجع عن هذه العملية!`)) {
+                if (confirm(`تأكيد نهائي: سيتم حذف جميع الأنشطة والصور والفيديوهات المرتبطة بها. هل تريد المتابعة؟`)) {
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '/admin/activities/delete_all';
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            }
+        }
+
+        // إغلاق modal عند النقر خارجه
+        document.getElementById('videoModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeVideoModal();
+            }
+        });
+
+        document.getElementById('activityMediaModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeActivityMediaModal();
+            }
+        });
+    </script>
+</body>
+</html> 

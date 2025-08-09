@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تعديل رقم الجلوس</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="font-['Cairo'] bg-gradient-to-br from-purple-50 to-blue-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">تعديل بيانات رقم الجلوس</h2>
+        <form method="POST" class="bg-white rounded-lg shadow-md p-6 max-w-lg mx-auto flex flex-col gap-4">
+            <div>
+                <label class="block mb-1 font-semibold">الرقم المدني</label>
+                <input type="text" value="{{ seat.civil_id }}" readonly class="border rounded px-3 py-2 w-full bg-gray-100">
+            </div>
+            <div>
+                <label class="block mb-1 font-semibold">الاسم</label>
+                <input name="name" type="text" value="{{ seat.name }}" required class="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-purple-200">
+            </div>
+            <div>
+                <label class="block mb-1 font-semibold">رقم الجلوس</label>
+                <input name="seat_number" type="text" value="{{ seat.seat_number }}" required class="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-purple-200">
+            </div>
+            <div>
+                <label class="block mb-1 font-semibold">اللجنة الرئيسية</label>
+                <select name="main_committee" required class="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-purple-200">
+                    <option value="" disabled>اختر اللجنة الرئيسية</option>
+                    {% for c in main_committees %}
+                    <option value="{{ c }}" {% if seat.main_committee == c %}selected{% endif %}>{{ c }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block mb-1 font-semibold">اللجنة الفرعية</label>
+                <select name="sub_committee" required class="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-purple-200">
+                    <option value="" disabled>اختر اللجنة الفرعية</option>
+                    {% for c in sub_committees %}
+                    <option value="{{ c }}" {% if seat.sub_committee == c %}selected{% endif %}>{{ c }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block mb-1 font-semibold">موقع اللجنة</label>
+                <input name="location" type="text" value="{{ seat.location }}" required class="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-purple-200">
+            </div>
+            <button type="submit" class="bg-purple-600 text-white rounded py-2 hover:bg-purple-700 transition">حفظ التعديلات</button>
+            <a href="/admin/seats" class="text-purple-600 hover:underline text-center mt-2">العودة لإدارة أرقام الجلوس</a>
+        </form>
+    </div>
+</body>
+</html> 

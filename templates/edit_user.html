@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تعديل مستخدم</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="font-['Cairo'] bg-gradient-to-br from-blue-50 to-green-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <h2 class="text-3xl font-bold text-gray-800 mb-6 text-center">تعديل بيانات المستخدم</h2>
+        <form method="POST" class="bg-white rounded-lg shadow-md p-6 max-w-lg mx-auto flex flex-col gap-4" id="editUserForm">
+            <div>
+                <label class="block mb-1 font-semibold">الرقم المدني</label>
+                <input type="text" value="{{ user.civil_id }}" readonly class="border rounded px-3 py-2 w-full bg-gray-100">
+            </div>
+            <div>
+                <label class="block mb-1 font-semibold">الاسم</label>
+                <input name="name" type="text" value="{{ user.name }}" required class="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-200">
+            </div>
+            <div>
+                <label class="block mb-1 font-semibold">المادة</label>
+                <input name="subject" type="text" required placeholder="المادة" value="{{ user.subject or '' }}" class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 col-span-1 w-full">
+            </div>
+            <div>
+                <label class="block mb-1 font-semibold">المسمى الوظيفي</label>
+                <input name="job_title" type="text" required placeholder="المسمى الوظيفي" value="{{ user.job_title or '' }}" class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 col-span-1 w-full">
+            </div>
+            <div>
+                <label class="block mb-1 font-semibold">كلمة المرور الجديدة (اتركها فارغة إذا لا تريد التغيير)</label>
+                <input name="password" type="password" placeholder="كلمة المرور الجديدة" class="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-200">
+            </div>
+            <div>
+                <label class="block mb-1 font-semibold">الصلاحية</label>
+                <select name="role" required class="border rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-200">
+                    <option value="مشرف" {% if user.role == 'مشرف' %}selected{% endif %}>مشرف</option>
+                    <option value="مشرف محتوى" {% if user.role == 'مشرف محتوى' %}selected{% endif %}>مشرف محتوى</option>
+                    <option value="عادي" {% if user.role == 'عادي' %}selected{% endif %}>عادي</option>
+                </select>
+            </div>
+            <button type="submit" class="bg-blue-600 text-white rounded py-2 hover:bg-blue-700 transition">حفظ التعديلات</button>
+            <a href="/admin/users" class="text-blue-600 hover:underline text-center mt-2">العودة لإدارة المستخدمين</a>
+        </form>
+    </div>
+    <script>
+    // إظهار input عند اختيار "أخرى..." في المادة
+    document.getElementById('subjectSelect').addEventListener('change', function() {
+        var otherInput = document.getElementById('subjectOtherInput');
+        if (this.value === '__other__') {
+            otherInput.classList.remove('hidden');
+            otherInput.required = true;
+        } else {
+            otherInput.classList.add('hidden');
+            otherInput.required = false;
+        }
+    });
+    // عند إرسال النموذج، إذا تم اختيار "أخرى..."، انسخ قيمة input للمادة
+    document.getElementById('editUserForm').addEventListener('submit', function(e) {
+        var subjectSelect = document.getElementById('subjectSelect');
+        var otherInput = document.getElementById('subjectOtherInput');
+        if (subjectSelect.value === '__other__') {
+            if (otherInput.value.trim() !== '') {
+                subjectSelect.value = otherInput.value.trim();
+            }
+        }
+    });
+    </script>
+</body>
+</html> 

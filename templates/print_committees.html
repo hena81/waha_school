@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قوائم اللجان - طباعة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Cairo', 'Arial', sans-serif;
+            font-size: 14px;
+            line-height: 1.4;
+            color: #000;
+            direction: rtl;
+        }
+        
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 5mm 15mm 5mm 15mm;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            page-break-after: always;
+        }
+        
+        .page:last-child {
+            page-break-after: avoid;
+        }
+        
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 6px;
+        }
+        
+        .header-right,
+        .header-left {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .header-center {
+            flex: 1;
+            text-align: center;
+        }
+        
+        .header-right {
+            text-align: right;
+        }
+        
+        .header-left {
+            text-align: left;
+        }
+        
+        .ministry-info {
+            font-weight: 700;
+            font-size: 14px;
+            line-height: 1.3;
+        }
+        
+        .school-logo {
+            max-height: 90px;
+            max-width: 140px;
+            object-fit: contain;
+        }
+        
+        .academic-info {
+            font-weight: 600;
+            font-size: 12px;
+            line-height: 1.3;
+        }
+        
+        /* Committee Info */
+        .committee-info {
+            background: #f5f5f5;
+            padding: 6px;
+            margin-bottom: 6px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        
+        .committee-title {
+            font-size: 15px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 4px;
+            color: #2c3e50;
+        }
+        
+        .committee-details {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-size: 14px;
+        }
+        
+        .committee-detail {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #34495e;
+        }
+        
+        .detail-value {
+            font-weight: 400;
+            margin-right: 5px;
+        }
+        
+        /* Table */
+        .students-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2px;
+            font-size: 14px;
+        }
+        
+        .students-table th,
+        .students-table td {
+            border: 1px solid #333;
+            padding: 6px;
+            text-align: center;
+            line-height: 1.3;
+            height: 24px;
+        }
+        
+        .students-table th {
+            background: #34495e;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            height: 26px;
+        }
+        
+        .students-table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        
+        .students-table tr:hover {
+            background: #e8f4f8;
+        }
+        
+        .serial-col {
+            width: 8%;
+        }
+        
+        .name-col {
+            width: 40%;
+        }
+        
+        .seat-col {
+            width: 20%;
+        }
+        
+        .notes-col {
+            width: 32%;
+            min-height: 24px;
+        }
+        
+        /* Print Styles */
+        @media print {
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            
+            .page {
+                margin: 0;
+                padding: 3mm 10mm 3mm 10mm;
+                box-shadow: none;
+                page-break-after: always;
+                width: 100%;
+                min-height: 100vh;
+            }
+            
+            .page:last-child {
+                page-break-after: avoid;
+            }
+            
+            .header {
+                position: static;
+                margin-bottom: 8px;
+            }
+            
+            .no-print {
+                display: none !important;
+            }
+        }
+        
+        @page {
+            size: A4;
+            margin: 5mm;
+        }
+        
+        /* Print Button */
+        .print-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        
+        .print-button:hover {
+            background: #2980b9;
+        }
+        
+        .print-button:active {
+            transform: translateY(1px);
+        }
+    </style>
+</head>
+<body>
+    <!-- Print Button -->
+    <button class="print-button no-print" onclick="window.print()">
+        🖨️ طباعة
+    </button>
+    
+    {% for main_committee, sub_committees in committees_data.items() %}
+        {% for sub_committee, students in sub_committees.items() %}
+        <div class="page">
+            <!-- Header -->
+            <div class="header">
+                <div class="header-right">
+                    <div class="ministry-info">
+                        <div>وزارة التربية</div>
+                        <div>منطقة الجهراء التعليمية</div>
+                        <div>{{ school_settings.school_name if school_settings and school_settings.school_name else 'اسم المدرسة' }}</div>
+                    </div>
+                </div>
+                
+                <div class="header-center">
+                    {% if school_settings and school_settings.school_logo %}
+                        <img src="/assets/images/{{ school_settings.school_logo }}" alt="شعار المدرسة" class="school-logo">
+                    {% else %}
+                        <img src="/assets/images/logo.png" alt="شعار المدرسة" class="school-logo">
+                    {% endif %}
+                </div>
+                
+                <div class="header-left">
+                    <div class="academic-info">
+                        <div><strong>العام الدراسي:</strong></div>
+                        <div>{{ school_settings.academic_year if school_settings and school_settings.academic_year else '2024-2025' }}</div>
+                        <div><strong>{{ school_settings.academic_semester if school_settings and school_settings.academic_semester else 'الفصل الدراسي الأول' }}</strong></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Committee Info -->
+            <div class="committee-info">
+                <div class="committee-title">
+                    بيانات اللجنة
+                </div>
+                <div class="committee-details">
+                    <div class="committee-detail">
+                        <span class="detail-label">اللجنة الرئيسية:</span>
+                        <span class="detail-value">{{ main_committee }}</span>
+                    </div>
+                    <div class="committee-detail">
+                        <span class="detail-label">اللجنة الفرعية:</span>
+                        <span class="detail-value">{{ sub_committee }}</span>
+                    </div>
+                    <div class="committee-detail">
+                        <span class="detail-label">مكان اللجنة:</span>
+                        <span class="detail-value">{{ students[0].location if students else '' }}</span>
+                    </div>
+                    <div class="committee-detail">
+                        <span class="detail-label">عدد الطلاب:</span>
+                        <span class="detail-value">{{ students|length }}</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Students Table -->
+            <table class="students-table">
+                <thead>
+                    <tr>
+                        <th class="serial-col">م</th>
+                        <th class="name-col">اسم الطالب</th>
+                        <th class="seat-col">رقم الجلوس</th>
+                        <th class="notes-col">ملاحظات</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td class="serial-col">{{ loop.index }}</td>
+                        <td class="name-col">{{ student.name }}</td>
+                        <td class="seat-col">{{ student.seat_number }}</td>
+                        <td class="notes-col">&nbsp;</td>
+                    </tr>
+                    {% endfor %}
+                    
+
+                </tbody>
+            </table>
+        </div>
+        {% endfor %}
+    {% endfor %}
+    
+    {% if not committees_data %}
+    <div class="page">
+        <div class="header">
+            <div class="header-right">
+                <div class="ministry-info">
+                    <div>وزارة التربية</div>
+                    <div>منطقة الجهراء التعليمية</div>
+                    <div>{{ school_settings.school_name if school_settings and school_settings.school_name else 'اسم المدرسة' }}</div>
+                </div>
+            </div>
+            
+            <div class="header-center">
+                {% if school_settings and school_settings.school_logo %}
+                    <img src="/assets/images/{{ school_settings.school_logo }}" alt="شعار المدرسة" class="school-logo">
+                {% else %}
+                    <img src="/assets/images/logo.png" alt="شعار المدرسة" class="school-logo">
+                {% endif %}
+            </div>
+            
+            <div class="header-left">
+                <div class="academic-info">
+                    <div><strong>العام الدراسي:</strong></div>
+                    <div>{{ school_settings.academic_year if school_settings and school_settings.academic_year else '2024-2025' }}</div>
+                    <div><strong>{{ school_settings.academic_semester if school_settings and school_settings.academic_semester else 'الفصل الدراسي الأول' }}</strong></div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 100px; font-size: 18px; color: #666;">
+            <p>لا توجد بيانات للطباعة</p>
+            <p>يرجى التأكد من وجود بيانات أرقام الجلوس والفلاتر المطبقة</p>
+        </div>
+    </div>
+    {% endif %}
+    
+    <script>
+        // Auto print when page loads
+        window.addEventListener('load', function() {
+            // Optional: Auto print after a short delay
+            // setTimeout(() => window.print(), 1000);
+        });
+        
+        // Handle print completion
+        window.addEventListener('afterprint', function() {
+            // Optional: Close window after printing
+            // window.close();
+        });
+    </script>
+</body>
+</html>

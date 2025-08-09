@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة بيانات الطلاب</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Typing effect */
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+
+        .typing-text {
+            border-right: 3px solid #fbbf24;
+            white-space: nowrap;
+        }
+
+        /* CTA Button */
+        .cta-button {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Glass effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .typing-text {
+                font-size: 1.5rem;
+                line-height: 2rem;
+            }
+        }
+
+        /* Advanced Animations for Statistics */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes slideInFromTop {
+            0% {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes slideOutToTop {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.9);
+            }
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3) translateY(30px);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05) translateY(-10px);
+            }
+            70% {
+                transform: scale(0.9) translateY(5px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* Stats Toggle Button Enhancements */
+        #statsToggle {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #statsToggle::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        #statsToggle:hover::before {
+            left: 100%;
+        }
+
+        /* Stats Content Container */
+        #statsContent {
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Card Hover Effects */
+        .stats-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-8px) scale(1.05) !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        /* Icon Rotation Animation */
+        #statsToggleIcon {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Glow Effect */
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+    </style>
+</head>
+<body class="font-['Cairo'] bg-gradient-to-br from-blue-50 to-green-100 min-h-screen">
+    <!-- Header & Hero Section -->
+    <section class="relative bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900 text-white overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 bg-black/20"></div>
+        
+        <!-- Header Navigation -->
+        <div class="relative z-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-32 md:h-36 lg:h-40">
+                    <!-- Right: Logo -->
+                    <div class="flex items-center flex-shrink-0">
+                        {% if school_settings and school_settings.school_logo %}
+                    <img src="/assets/images/{{ school_settings.school_logo }}" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto ">
+                {% else %}
+                    {% if school_settings and school_settings.school_logo %}
+                    <img src="/assets/images/{{ school_settings.school_logo }}" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto ">
+                {% else %}
+                    <img src="/assets/images/logo.png" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto ">
+                {% endif %}
+                {% endif %}
+                    </div>
+                    <!-- Center: School Name (always visible) -->
+                    <div class="flex-1 flex justify-center">
+                                        <span class="text-base md:text-3xl font-extrabold text-yellow-400 tracking-wide font-['Cairo','Noto Kufi Arabic',sans-serif] select-none">
+                    {% if school_settings and school_settings.school_name %}
+                        {{ school_settings.school_name }}
+                    {% else %}
+                        سجل بيانات المدرسة من الاعدادات
+                    {% endif %}
+                </span>
+                    </div>
+                    <!-- Left: Navigation & Hamburger -->
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <!-- Desktop Nav -->
+                        <nav class="hidden md:flex items-center space-x-1 space-x-reverse mr-4">
+                            <a href="/admin" class="px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition">لوحة التحكم</a>
+                            <a href="/logout" class="px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition">تسجيل الخروج</a>
+                        </nav>
+                        <!-- Mobile menu button -->
+                        <button onclick="toggleMobileMenu()" class="md:hidden flex items-center justify-center w-11 h-11 rounded-lg bg-white/10 text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 transition" aria-label="فتح القائمة">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white/10 backdrop-blur-md border-t border-white/10 z-40 relative">
+            <nav class="flex flex-col py-2 px-4 space-y-1">
+                <a href="/admin" class="block px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition">لوحة التحكم</a>
+                <a href="/logout" class="block px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition">تسجيل الخروج</a>
+            </nav>
+        </div>
+
+        <!-- Hero Content -->
+        <div class="relative z-10 pb-32">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+                <div class="text-center">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-6 typing-text mt-16">
+                        إدارة بيانات الطلاب
+                    </h1>
+                    <p class="text-xl md:text-2xl text-white/80 mb-8 max-w-3xl mx-auto mt-8">
+                        إضافة وإدارة بيانات الطلاب في النظام
+                    </p>
+                    <div class="flex justify-center">
+                        <button class="cta-button bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300">
+                            إضافة طالب جديد
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- أيقونة الرئيسية -->
+    <div class="fixed left-4 top-1/2 transform -translate-y-1/2 z-50">
+        <a href="/admin" class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl">
+            <i class="fas fa-home text-xl"></i>
+        </a>
+    </div>
+
+    <!-- Statistics Section -->
+    <section class="bg-white py-8 shadow-sm">
+        <div class="container mx-auto px-4">
+            <!-- Toggle Button -->
+            <div class="text-center mb-6">
+                <button id="statsToggle" class="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                    <span class="flex items-center justify-center">
+                        <i class="fas fa-chart-bar text-xl ml-3"></i>
+                        <span id="statsToggleText">عرض إحصائيات الطلاب</span>
+                        <i id="statsToggleIcon" class="fas fa-chevron-down text-sm mr-3 transform transition-transform duration-300"></i>
+                    </span>
+                </button>
+            </div>
+            
+            <!-- Statistics Content -->
+            <div id="statsContent" class="opacity-0 max-h-0 overflow-hidden transition-all duration-700 ease-in-out transform scale-95">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">إحصائيات الطلاب</h2>
+                
+                <!-- إحصائيات عامة -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <!-- إجمالي الطلاب -->
+                    <div class="stats-card bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg p-4 text-center transform transition-all duration-300">
+                        <i class="fas fa-users text-2xl mb-2"></i>
+                        <h3 class="text-lg font-bold">{{ students|length }}</h3>
+                        <p class="text-sm opacity-90">إجمالي الطلاب</p>
+                    </div>
+                    
+                    <!-- إجمالي الصفوف -->
+                    <div class="stats-card bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg p-4 text-center transform transition-all duration-300">
+                        <i class="fas fa-layer-group text-2xl mb-2"></i>
+                        {% set unique_grades = students|map(attribute='grade')|unique|list %}
+                        <h3 class="text-lg font-bold">{{ unique_grades|length }}</h3>
+                        <p class="text-sm opacity-90">عدد الصفوف</p>
+                    </div>
+                    
+                    <!-- إجمالي الشعب -->
+                    <div class="stats-card bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg p-4 text-center transform transition-all duration-300">
+                        <i class="fas fa-object-group text-2xl mb-2"></i>
+                        {% set unique_sections = [] %}
+                        {% for student in students %}
+                            {% set grade_section = student.grade + '-' + student.section|string %}
+                            {% if grade_section not in unique_sections %}
+                                {% if unique_sections.append(grade_section) %}{% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        <h3 class="text-lg font-bold">{{ unique_sections|length }}</h3>
+                        <p class="text-sm opacity-90">إجمالي الشعب</p>
+                    </div>
+                    
+                    <!-- متوسط الطلاب بالشعبة -->
+                    <div class="stats-card bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-lg p-4 text-center transform transition-all duration-300">
+                        <i class="fas fa-calculator text-2xl mb-2"></i>
+                        {% if unique_sections|length > 0 %}
+                            <h3 class="text-lg font-bold">{{ (students|length / unique_sections|length)|round|int }}</h3>
+                        {% else %}
+                            <h3 class="text-lg font-bold">0</h3>
+                        {% endif %}
+                        <p class="text-sm opacity-90">متوسط طلاب الشعبة</p>
+                    </div>
+                </div>
+                
+                <!-- إحصائيات الصفوف -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">إحصائيات الصفوف</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                        {% set grade_order = ['10', '11 أدبي', '11 علمي', '12 أدبي', '12 علمي'] %}
+                        {% for grade in grade_order %}
+                            {% if grade in unique_grades %}
+                            {% set grade_students = students|selectattr('grade', 'equalto', grade)|list %}
+                            {% set grade_sections = grade_students|map(attribute='section')|unique|list %}
+                            <div class="stats-card bg-gradient-to-br from-indigo-100 to-indigo-200 text-gray-800 rounded-lg p-4 text-center border border-indigo-300 transition-all duration-300">
+                                <i class="fas fa-graduation-cap text-2xl mb-2 text-indigo-600"></i>
+                                <h4 class="text-lg font-bold text-indigo-800">الصف {{ grade }}</h4>
+                                <div class="mt-2 space-y-1">
+                                    <p class="text-sm"><span class="font-semibold">الطلاب:</span> {{ grade_students|length }}</p>
+                                    <p class="text-sm"><span class="font-semibold">الشعب:</span> {{ grade_sections|length }}</p>
+                                    {% if grade_sections|length > 0 %}
+                                    <p class="text-xs opacity-70">متوسط: {{ (grade_students|length / grade_sections|length)|round|int }} طالب/شعبة</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- تفاصيل الشعب -->
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">تفاصيل الشعب</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+                        {% set grade_order = ['10', '11 أدبي', '11 علمي', '12 أدبي', '12 علمي'] %}
+                        {% for grade in grade_order %}
+                            {% if grade in unique_grades %}
+                            {% set grade_students = students|selectattr('grade', 'equalto', grade)|list %}
+                            {% set grade_sections = grade_students|map(attribute='section')|unique|list %}
+                            {% for section in grade_sections|sort %}
+                                {% set section_students = grade_students|selectattr('section', 'equalto', section)|list %}
+                                <div class="stats-card bg-gradient-to-br from-gray-50 to-gray-100 text-gray-800 rounded-lg p-3 text-center border border-gray-200 transition-all duration-300">
+                                    <i class="fas fa-users text-sm mb-1 text-blue-600"></i>
+                                    <h5 class="text-sm font-bold">{{ grade }}/{{ section }}</h5>
+                                    <p class="text-xs opacity-70">{{ section_students|length }} طالب</p>
+                                </div>
+                            {% endfor %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        {% if edit_student %}
+        <!-- نموذج تعديل بيانات الطالب -->
+        <form method="POST" enctype="multipart/form-data" class="bg-yellow-50 border border-yellow-300 rounded-lg shadow-md p-6 mb-8 grid grid-cols-1 md:grid-cols-5 gap-4 w-full max-w-5xl mx-auto">
+            <input name="civil_id" type="text" value="{{ edit_student.civil_id }}" readonly class="border rounded px-3 py-2 bg-gray-100 text-gray-500 focus:outline-none col-span-1 w-full" title="لا يمكن تعديل الرقم المدني">
+            <input name="name" type="text" required placeholder="اسم الطالب" value="{{ edit_student.name }}" class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-200 col-span-1 w-full">
+            <select name="grade" required class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-200 col-span-1 w-full">
+                <option value="" disabled>الصف</option>
+                <option value="10" {% if edit_student.grade == '10' %}selected{% endif %}>10</option>
+                <option value="11 أدبي" {% if edit_student.grade == '11 أدبي' %}selected{% endif %}>11 أدبي</option>
+                <option value="11 علمي" {% if edit_student.grade == '11 علمي' %}selected{% endif %}>11 علمي</option>
+                <option value="12 أدبي" {% if edit_student.grade == '12 أدبي' %}selected{% endif %}>12 أدبي</option>
+                <option value="12 علمي" {% if edit_student.grade == '12 علمي' %}selected{% endif %}>12 علمي</option>
+            </select>
+            <select name="section" required class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-200 col-span-1 w-full">
+                <option value="" disabled>الشعبة</option>
+                {% for i in range(1, 16) %}
+                <option value="{{ i }}" {% if edit_student.section == i|string %}selected{% endif %}>{{ i }}</option>
+                {% endfor %}
+            </select>
+            <input name="password" type="text" required placeholder="كلمة المرور" value="{{ edit_student.password }}" class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-200 col-span-1 w-full">
+            <button type="submit" class="col-span-1 md:col-span-3 bg-yellow-600 text-white rounded py-2 mt-2 hover:bg-yellow-700 transition w-full">حفظ التعديلات</button>
+            <a href="/admin/students" class="col-span-1 md:col-span-2 bg-gray-300 text-gray-800 rounded py-2 mt-2 hover:bg-gray-400 transition w-full text-center">إلغاء</a>
+        </form>
+        {% else %}
+        <!-- نموذج إضافة طالب -->
+        <form method="POST" enctype="multipart/form-data" class="bg-white rounded-lg shadow-md p-6 mb-8 grid grid-cols-1 md:grid-cols-5 gap-4 w-full max-w-5xl mx-auto">
+            <input name="civil_id" type="text" required maxlength="12" minlength="12" pattern="\d{12}" placeholder="الرقم المدني (12 رقم)" class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 col-span-1 w-full">
+            <input name="name" type="text" required placeholder="اسم الطالب" class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 col-span-1 w-full">
+            <select name="grade" required class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 col-span-1 w-full">
+                <option value="" disabled selected>الصف</option>
+                <option>10</option>
+                <option>11 أدبي</option>
+                <option>11 علمي</option>
+                <option>12 أدبي</option>
+                <option>12 علمي</option>
+            </select>
+            <select name="section" required class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 col-span-1 w-full">
+                <option value="" disabled selected>الشعبة</option>
+                {% for i in range(1, 16) %}
+                <option>{{ i }}</option>
+                {% endfor %}
+            </select>
+            <input name="password" type="text" required placeholder="كلمة المرور" class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 col-span-1 w-full">
+            <button type="submit" class="col-span-1 md:col-span-5 bg-blue-600 text-white rounded py-2 mt-2 hover:bg-blue-700 transition w-full">إضافة طالب</button>
+        </form>
+        {% endif %}
+        <!-- رسائل فلاش -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class="mb-4">
+              {% for category, message in messages %}
+                <li class="text-{{ 'red' if category == 'danger' else 'green' }}-600">{{ message|safe }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+        <!-- أدوات الفلترة -->
+        <div class="flex flex-col gap-3 mb-6">
+            <div class="flex flex-wrap gap-2 justify-center items-center">
+                <form method="POST" action="/admin/students/upload" enctype="multipart/form-data" class="flex items-center" id="excelUploadForm">
+                    <input type="file" name="excel_file" accept=".xlsx" required class="hidden" id="excelFileInput">
+                    <label for="excelFileInput" class="inline-flex items-center justify-center bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg px-6 py-3 md:px-8 md:py-4 text-sm md:text-base gap-2 cursor-pointer min-w-[120px] md:min-w-[180px] min-h-[40px] md:min-h-[56px] transition">
+                        <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M7 10l5 5m0 0l5-5m-5 5V4"/></svg>
+                        رفع ملف إكسل
+                    </label>
+                    <button type="submit" class="hidden">رفع</button>
+                </form>
+                <a href="/admin/students/template" class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg px-6 py-3 md:px-8 md:py-4 text-sm md:text-base gap-2 min-w-[120px] md:min-w-[180px] min-h-[40px] md:min-h-[56px] transition" download>
+                    <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/></svg>
+                    تحميل قالب إكسل
+                </a>
+                {% if session.role == 'مشرف' %}
+                <form method="POST" action="/admin/students/delete_all" onsubmit="return confirm('هل أنت متأكد من حذف جميع بيانات الطلاب؟');" class="">
+                    <button type="submit" class="inline-flex items-center justify-center bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg px-6 py-3 md:px-8 md:py-4 text-sm md:text-base min-w-[120px] md:min-w-[180px] min-h-[40px] md:min-h-[56px] transition">مسح كل البيانات</button>
+                </form>
+                {% endif %}
+            </div>
+            <div class="flex flex-wrap gap-2 justify-center items-center">
+                <input id="filterName" type="text" placeholder="ابحث بالاسم..." class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 w-full md:w-64">
+                <select id="filterGrade" class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 w-full md:w-48">
+                    <option value="">كل الصفوف</option>
+                    <option>10</option>
+                    <option>11 أدبي</option>
+                    <option>11 علمي</option>
+                    <option>12 أدبي</option>
+                    <option>12 علمي</option>
+                </select>
+                <select id="filterSection" class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 w-full md:w-40">
+                    <option value="">كل الشعب</option>
+                    {% for i in range(1, 16) %}
+                    <option>{{ i }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <!-- جدول الطلاب -->
+        <div class="overflow-x-auto w-full max-w-5xl mx-auto">
+            <table id="studentsTable" class="min-w-full bg-white rounded-lg shadow-md text-xs md:text-base">
+                <thead>
+                    <tr>
+                        <th class="py-2 px-2 md:px-4">#</th>
+                        <th class="py-2 px-2 md:px-4">الرقم المدني</th>
+                        <th class="py-2 px-2 md:px-4">اسم الطالب</th>
+                        <th class="py-2 px-2 md:px-4">الصف</th>
+                        <th class="py-2 px-2 md:px-4">الشعبة</th>
+                        <th class="py-2 px-2 md:px-4">كلمة المرور</th>
+                        <th class="py-2 px-2 md:px-4">تعديل</th>
+                        <th class="py-2 px-2 md:px-4">حذف</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr class="border-b hover:bg-blue-50">
+                        <td class="py-2 px-2 md:px-4">{{ loop.index }}</td>
+                        <td class="py-2 px-2 md:px-4">{{ student.civil_id }}</td>
+                        <td class="py-2 px-2 md:px-4">{{ student.name }}</td>
+                        <td class="py-2 px-2 md:px-4">{{ student.grade }}</td>
+                        <td class="py-2 px-2 md:px-4">{{ student.section }}</td>
+                        <td class="py-2 px-2 md:px-4">{{ student.password }}</td>
+                        <td class="py-2 px-2 md:px-4">
+                            <a href="/admin/students/edit/{{ student.civil_id }}" class="text-blue-600 hover:underline font-bold">تعديل</a>
+                        </td>
+                                                   <td class="py-2 px-2 md:px-4">
+                               {% if session.role == 'مشرف' or session.role == 'مشرف محتوى' %}
+                               <form method="POST" action="/admin/students/delete/{{ student.civil_id }}" onsubmit="return confirm('هل أنت متأكد من حذف هذا الطالب؟');">
+                                   <button type="submit" class="text-red-600 hover:underline font-bold">حذف</button>
+                               </form>
+                               {% endif %}
+                           </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+    // فلترة الطلاب
+    function normalizeArabic(str) {
+        return str.replace(/[\u064B-\u0652]/g, '').replace(/\s+/g, '').replace(/[أإآا]/g, 'ا').replace(/[ة]/g, 'ه').replace(/[ى]/g, 'ي').toLowerCase();
+    }
+    document.getElementById('filterName').addEventListener('input', filterStudents);
+    document.getElementById('filterGrade').addEventListener('change', filterStudents);
+    document.getElementById('filterSection').addEventListener('change', filterStudents);
+    function filterStudents() {
+        var nameFilter = normalizeArabic(document.getElementById('filterName').value.trim());
+        var gradeFilter = document.getElementById('filterGrade').value;
+        var sectionFilter = document.getElementById('filterSection').value;
+        var table = document.getElementById('studentsTable');
+        var trs = table.getElementsByTagName('tr');
+        for (var i = 1; i < trs.length; i++) {
+            var tds = trs[i].getElementsByTagName('td');
+            if (tds.length < 5) continue;
+            var name = tds[2].textContent || tds[2].innerText;
+            var grade = tds[3].textContent || tds[3].innerText;
+            var section = tds[4].textContent || tds[4].innerText;
+            var show = true;
+            if (nameFilter) {
+                var normalizedName = normalizeArabic(name);
+                show = normalizedName.includes(nameFilter);
+            }
+            if (gradeFilter && grade !== gradeFilter) show = false;
+            if (sectionFilter && section !== sectionFilter) show = false;
+            trs[i].style.display = show ? '' : 'none';
+        }
+    }
+    // قائمة الهامبرجر
+    function toggleMobileMenu() {
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenu) {
+            mobileMenu.classList.toggle('hidden');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Statistics Toggle Functionality
+        const statsToggle = document.getElementById('statsToggle');
+        const statsContent = document.getElementById('statsContent');
+        const statsToggleText = document.getElementById('statsToggleText');
+        const statsToggleIcon = document.getElementById('statsToggleIcon');
+        let isStatsVisible = false;
+
+        // Load saved state from localStorage
+        const savedStatsState = localStorage.getItem('studentsStatsVisible');
+        if (savedStatsState === 'true') {
+            showStats();
+        }
+
+        if (statsToggle) {
+            statsToggle.addEventListener('click', function() {
+                if (isStatsVisible) {
+                    hideStats();
+                } else {
+                    showStats();
+                }
+            });
+        }
+
+        function showStats() {
+            isStatsVisible = true;
+            
+            // Update button text and icon
+            statsToggleText.textContent = 'إخفاء إحصائيات الطلاب';
+            statsToggleIcon.style.transform = 'rotate(180deg)';
+            
+            // Animate content appearance
+            statsContent.style.maxHeight = '2000px';
+            statsContent.style.opacity = '1';
+            statsContent.style.transform = 'scale(1)';
+            
+            // Add stagger animation to cards
+            setTimeout(() => {
+                const cards = statsContent.querySelectorAll('.stats-card');
+                cards.forEach((card, index) => {
+                    setTimeout(() => {
+                        card.style.transform = 'translateY(0) scale(1)';
+                        card.style.opacity = '1';
+                    }, index * 50);
+                });
+            }, 100);
+            
+            // Save state
+            localStorage.setItem('studentsStatsVisible', 'true');
+            
+            // Add pulse effect to button
+            statsToggle.style.animation = 'pulse 0.5s ease-in-out';
+            setTimeout(() => {
+                statsToggle.style.animation = '';
+            }, 500);
+        }
+
+        function hideStats() {
+            isStatsVisible = false;
+            
+            // Update button text and icon
+            statsToggleText.textContent = 'عرض إحصائيات الطلاب';
+            statsToggleIcon.style.transform = 'rotate(0deg)';
+            
+            // Animate content disappearance
+            const cards = statsContent.querySelectorAll('.stats-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.transform = 'translateY(-20px) scale(0.9)';
+                    card.style.opacity = '0';
+                }, index * 30);
+            });
+            
+            setTimeout(() => {
+                statsContent.style.maxHeight = '0';
+                statsContent.style.opacity = '0';
+                statsContent.style.transform = 'scale(0.95)';
+            }, 300);
+            
+            // Save state
+            localStorage.setItem('studentsStatsVisible', 'false');
+        }
+
+        // Initialize card animations
+        const cards = statsContent.querySelectorAll('.stats-card');
+        cards.forEach(card => {
+            card.style.transform = 'translateY(20px) scale(0.9)';
+            card.style.opacity = '0';
+            card.style.transition = 'all 0.3s ease-in-out';
+        });
+
+        // Enhanced button interactions
+        if (statsToggle) {
+            statsToggle.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05) translateY(-2px)';
+                this.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.2)';
+            });
+
+            statsToggle.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1) translateY(0)';
+                this.style.boxShadow = '0 10px 25px rgba(0, 0, 0, 0.15)';
+            });
+        }
+
+        // Handle outside clicks to close mobile menu
+        document.addEventListener('click', function(e) {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuButton = document.querySelector('[onclick="toggleMobileMenu()"]');
+            
+            if (mobileMenu && !mobileMenu.contains(e.target) && !mobileMenuButton.contains(e.target)) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+
+        // Handle ESC key to close mobile menu
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                const mobileMenu = document.getElementById('mobile-menu');
+                if (mobileMenu) {
+                    mobileMenu.classList.add('hidden');
+                }
+            }
+        });
+
+        // Typing effect
+        const typingText = document.querySelector('.typing-text');
+        if (typingText) {
+            const text = typingText.textContent;
+            typingText.textContent = '';
+            
+            let i = 0;
+            const typeWriter = () => {
+                if (i < text.length) {
+                    typingText.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 100);
+                }
+            };
+            typeWriter();
+        }
+
+        // Button hover effects
+        const ctaButton = document.querySelector('.cta-button');
+        if (ctaButton) {
+            ctaButton.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-4px) scale(1.05)';
+            });
+            
+            ctaButton.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        }
+    });
+
+    document.getElementById('excelFileInput').addEventListener('change', function() {
+        this.form.querySelector('button[type="submit"]').click();
+    });
+    </script>
+</body>
+</html> 

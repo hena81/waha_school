@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المواد التعليمية - الطالب</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <style>
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        
+        /* Custom Animations and Effects */
+        @keyframes fade-in-up {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in-up {
+            animation: fade-in-up 1s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .animation-delay-100 { animation-delay: 0.1s; }
+        .animation-delay-200 { animation-delay: 0.2s; }
+        .animation-delay-300 { animation-delay: 0.3s; }
+        .animation-delay-400 { animation-delay: 0.4s; }
+        .animation-delay-500 { animation-delay: 0.5s; }
+        .animation-delay-600 { animation-delay: 0.6s; }
+        .animation-delay-700 { animation-delay: 0.7s; }
+        .animation-delay-800 { animation-delay: 0.8s; }
+        
+        /* Typing Effect */
+        @keyframes typing {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+        
+        @keyframes blink {
+            0%, 50% { border-color: transparent; }
+            51%, 100% { border-color: white; }
+        }
+        
+        .typing-text {
+            display: inline-block;
+            overflow: visible;
+            white-space: nowrap;
+            border-right: 3px solid white;
+            animation: typing 3s steps(40, end), blink 0.75s step-end infinite;
+            line-height: 1.2;
+            padding: 0.1em 0;
+        }
+
+        /* Enhanced Button Styles */
+        .cta-button {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        /* Enhanced Hover Effects */
+        .hover-glow:hover {
+            box-shadow: 0 0 30px rgba(255, 193, 7, 0.5);
+        }
+        
+        /* Glass Morphism Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .typing-text {
+                animation: none;
+                border-right: none;
+            }
+        }
+        
+        /* Fix for Arabic Text Clipping */
+        .overflow-visible {
+            overflow: visible !important;
+        }
+        
+        /* Enhanced Arabic Typography */
+        h1, h2, h3, h4, h5, h6 {
+            line-height: 1.4 !important;
+            padding: 0.1em 0 !important;
+        }
+        
+        /* Ensure Arabic text displays properly */
+        .arabic-text {
+            text-rendering: optimizeLegibility;
+            font-feature-settings: "liga" 1, "kern" 1;
+        }
+        
+        /* Mobile Menu Animation */
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Mobile Menu Positioning */
+        #mobile-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            z-index: 50;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Ensure header container is relative for mobile menu positioning */
+        #header-container {
+            position: relative;
+        }
+    </style>
+</head>
+<body class="font-['Cairo'] bg-gradient-to-br from-blue-50 to-green-100 min-h-screen" x-data="materialsApp()">
+    <!-- Combined Header and Hero Section -->
+    <section class="relative bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 overflow-hidden">
+        <!-- Static Gradient Background -->
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900"></div>
+        
+        <!-- Overlay for Text Clarity -->
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
+        
+        <!-- Header Navigation -->
+        <div class="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" id="header-container">
+            <div class="flex items-center justify-between h-32 md:h-36 lg:h-40">
+                <div class="flex items-center flex-shrink-0">
+                    {% if school_settings and school_settings.school_logo %}
+                    <img src="/assets/images/{{ school_settings.school_logo }}" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto drop-shadow-lg ">
+                {% else %}
+                    {% if school_settings and school_settings.school_logo %}
+                    <img src="/assets/images/{{ school_settings.school_logo }}" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto drop-shadow-lg ">
+                {% else %}
+                    <img src="/assets/images/logo.png" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto drop-shadow-lg ">
+                {% endif %}
+                {% endif %}
+                </div>
+                <div class="flex-1 flex justify-center">
+                                                            <span class="text-base md:text-3xl font-extrabold text-yellow-400 tracking-wide font-['Cairo','Noto Kufi Arabic',sans-serif] select-none">
+                    {% if school_settings and school_settings.school_name %}
+                        {{ school_settings.school_name }}
+                    {% else %}
+                        سجل بيانات المدرسة من الاعدادات
+                    {% endif %}
+                </span>
+                </div>
+                <!-- Desktop Navigation Links -->
+                <div class="hidden md:flex items-center space-x-2 space-x-reverse">
+                    <a href="/student_home" class="px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">الرئيسية</a>
+                    <a href="/logout" class="px-2 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">تسجيل الخروج</a>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-white hover:text-yellow-400 focus:outline-none focus:text-yellow-400 transition-colors">
+                        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="hidden md:hidden absolute top-full left-0 right-0 bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 backdrop-blur-sm border-t border-white/20 shadow-lg z-30">
+                <div class="px-4 py-2 space-y-1">
+                    <a href="/student_home" class="block px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/10 transition-all duration-300">الرئيسية</a>
+                    <a href="/logout" class="block px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/10 transition-all duration-300">تسجيل الخروج</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Hero Content -->
+        <div class="relative z-10 container mx-auto px-6 flex flex-col justify-center items-center text-center pb-32">
+            <!-- Main Title with Typing Effect -->
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-8 text-white drop-shadow-2xl leading-relaxed animate-fade-in-up animation-delay-200 overflow-visible mt-16">
+                <span class="typing-text">المواد التعليمية</span>
+            </h1>
+            
+            <!-- Subtitle -->
+            <p class="text-xl md:text-2xl lg:text-3xl mb-8 max-w-4xl text-white/90 drop-shadow-lg leading-relaxed animate-fade-in-up animation-delay-400">
+                اختر المادة لعرض المحتوى التعليمي - المرحلة: {{ student.grade if student else '10' }}
+            </p>
+        </div>
+    </section>
+
+    <div class="container mx-auto px-4 py-8">
+
+        <!-- عرض المرحلة الدراسية -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">مرحلتك الدراسية</h2>
+            <div class="grid grid-cols-1 gap-4">
+                <div class="px-4 py-3 rounded-lg font-medium bg-purple-600 text-white text-center">
+                    {{ student.grade if student else '10' }}
+                </div>
+            </div>
+        </div>
+
+        <!-- اختيار المادة -->
+        <div x-show="subjectsForStage.length > 0" x-transition:enter="slide-in" class="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <h2 class="text-xl font-semibold text-gray-800 mb-4">اختر المادة</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <template x-for="subject in subjectsForStage" :key="subject">
+                    <button 
+                        @click="selectSubject(subject)"
+                        :class="selectedSubject === subject ? 'bg-green-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-green-100'"
+                        class="px-4 py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-105"
+                        x-text="subject">
+                    </button>
+                </template>
+            </div>
+        </div>
+
+        <!-- عرض المواد التعليمية -->
+        <div x-show="selectedSubject && filteredMaterials.length > 0" x-transition:enter="fade-in" class="space-y-6">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">
+                    المواد التعليمية - <span x-text="selectedStage"></span> - <span x-text="selectedSubject"></span>
+                </h2>
+                
+                <div class="grid gap-6">
+                    <template x-for="material in filteredMaterials" :key="material.id">
+                        <div class="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow duration-200">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-3 mb-2">
+                                        <h3 class="text-lg font-semibold text-gray-800" x-text="material.title"></h3>
+                                        <span 
+                                            :class="material.material_type === 'PDF' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'"
+                                            class="px-2 py-1 rounded-full text-xs font-medium"
+                                            x-text="material.material_type">
+                                        </span>
+                                    </div>
+                                    <p class="text-gray-600 mb-3" x-text="material.description"></p>
+                                    <div class="text-sm text-gray-500">
+                                        <span x-text="formatDate(material.upload_date)"></span>
+                                    </div>
+                                </div>
+                                <div class="flex gap-2">
+                                    <template x-if="material.material_type === 'PDF'">
+                                        <a 
+                                            :href="'/assets/materials/' + material.file_path"
+                                            target="_blank"
+                                            class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200">
+                                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                            </svg>
+                                            تحميل
+                                        </a>
+                                    </template>
+                                    <template x-if="material.material_type === 'فيديو'">
+                                        <a 
+                                            :href="getVideoUrl(material.video_url)"
+                                            target="_blank"
+                                            class="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200">
+                                            مشاهدة
+                                        </a>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+        <!-- رسالة عدم وجود مواد -->
+        <div x-show="selectedSubject && filteredMaterials.length === 0" x-transition:enter="fade-in" class="text-center py-12">
+            <div class="bg-white rounded-lg shadow-lg p-8">
+                <svg class="w-16 h-16 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <h3 class="text-lg font-semibold text-gray-800 mb-2">لا توجد مواد تعليمية</h3>
+                <p class="text-gray-600">لم يتم رفع أي مواد تعليمية لهذه المادة بعد</p>
+            </div>
+        </div>
+    </div>
+
+
+
+    <script>
+        function materialsApp() {
+            return {
+                stages: ['10', '11 أدبي', '11 علمي', '12 أدبي', '12 علمي'],
+                studentStage: '{{ student.grade if student else "10" }}',
+                selectedStage: null,
+                selectedSubject: null,
+                materials: [],
+                
+                get subjectsForStage() {
+                    return this.materials
+                        .map(m => m.subject)
+                        .filter((subject, index, arr) => arr.indexOf(subject) === index);
+                },
+                
+                get filteredMaterials() {
+                    if (!this.selectedSubject) return [];
+                    return this.materials.filter(m => 
+                        m.subject === this.selectedSubject
+                    );
+                },
+                
+                selectSubject(subject) {
+                    this.selectedSubject = subject;
+                },
+                
+
+                
+                formatDate(dateString) {
+                    const date = new Date(dateString);
+                    return date.toLocaleDateString('ar-SA', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                },
+                
+
+                
+                getVideoUrl(url) {
+                    // استخراج معرف الفيديو من روابط YouTube المختلفة
+                    let videoId = null;
+                    
+                    // youtube.com/embed/VIDEO_ID
+                    if (url.includes('youtube.com/embed/')) {
+                        videoId = url.split('embed/')[1];
+                    }
+                    // youtube.com/watch?v=VIDEO_ID
+                    else if (url.includes('youtube.com/watch?v=')) {
+                        videoId = url.split('v=')[1];
+                    }
+                    // youtu.be/VIDEO_ID
+                    else if (url.includes('youtu.be/')) {
+                        videoId = url.split('youtu.be/')[1];
+                    }
+                    
+                    // إزالة أي معاملات إضافية
+                    if (videoId && videoId.includes('&')) {
+                        videoId = videoId.split('&')[0];
+                    }
+                    
+                    // إرجاع رابط YouTube العادي
+                    if (videoId) {
+                        return `https://www.youtube.com/watch?v=${videoId}`;
+                    }
+                    
+                    // إذا لم نتمكن من تحويل الرابط، ارجع الرابط الأصلي
+                    return url;
+                },
+                
+                async loadMaterials() {
+                    try {
+                        const response = await fetch('/api/student_materials');
+                        if (response.ok) {
+                            this.materials = await response.json();
+                        }
+                    } catch (error) {
+                        console.error('Error loading materials:', error);
+                    }
+                },
+                
+                init() {
+                    this.loadMaterials();
+                }
+            }
+        }
+    </script>
+    
+    <script>
+        // Enhanced mobile menu function
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu) {
+                mobileMenu.classList.toggle('hidden');
+                
+                // Add smooth animation
+                if (!mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.style.animation = 'slideDown 0.3s ease-out';
+                }
+            }
+        }
+        
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuButton = document.querySelector('[onclick="toggleMobileMenu()"]');
+            
+            if (mobileMenu && !mobileMenu.contains(event.target) && !mobileMenuButton.contains(event.target)) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+        
+        // Close mobile menu on window resize
+        window.addEventListener('resize', function() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (window.innerWidth >= 768 && mobileMenu) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+        
+        document.addEventListener('DOMContentLoaded', function () {
+            // Typing Effect Enhancement
+            const typingText = document.querySelector('.typing-text');
+            if (typingText && window.innerWidth > 768) {
+                const text = typingText.textContent;
+                typingText.textContent = '';
+                let i = 0;
+                
+                function typeWriter() {
+                    if (i < text.length) {
+                        typingText.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, 100);
+                    }
+                }
+                
+                // Start typing after a delay
+                setTimeout(typeWriter, 500);
+            }
+        });
+    </script>
+</body>
+</html> 

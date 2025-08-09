@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جميع أخبار المدرسة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Animations and Effects */
+        @keyframes fade-in-up {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in-up {
+            animation: fade-in-up 1s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .animation-delay-100 { animation-delay: 0.1s; }
+        .animation-delay-200 { animation-delay: 0.2s; }
+        .animation-delay-300 { animation-delay: 0.3s; }
+        .animation-delay-400 { animation-delay: 0.4s; }
+        .animation-delay-500 { animation-delay: 0.5s; }
+        .animation-delay-600 { animation-delay: 0.6s; }
+        .animation-delay-700 { animation-delay: 0.7s; }
+        .animation-delay-800 { animation-delay: 0.8s; }
+        
+        /* News Card Hover Effects */
+        .news-card {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .news-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        /* Image Zoom Effect */
+        .news-image {
+            transition: transform 0.5s ease;
+        }
+        
+        .news-card:hover .news-image {
+            transform: scale(1.1);
+        }
+        
+        /* Badge Animations */
+        .news-badge {
+            transition: all 0.3s ease;
+        }
+        
+        .news-badge:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Button Hover Effects */
+        .news-button {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .news-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5);
+        }
+        
+        /* Typing Effect */
+        @keyframes typing {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+        
+        @keyframes blink {
+            0%, 50% { border-color: transparent; }
+            51%, 100% { border-color: white; }
+        }
+        
+        .typing-text {
+            display: inline-block;
+            overflow: visible;
+            white-space: nowrap;
+            border-right: 3px solid white;
+            animation: typing 3s steps(40, end), blink 0.75s step-end infinite;
+            line-height: 1.2;
+            padding: 0.1em 0;
+        }
+
+        /* Enhanced Button Styles */
+        .cta-button {
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* توحيد ارتفاع كروت الأخبار */
+        .news-card {
+            height: 450px !important;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .news-card .bg-white\/90 {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .news-card .bg-white\/90 .relative.overflow-hidden.h-48 {
+            flex-shrink: 0;
+            height: 192px !important;
+        }
+
+        .news-card .bg-white\/90 .p-6 {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .news-card .bg-white\/90 .p-6 h3 {
+            flex-shrink: 0;
+        }
+
+        .news-card .bg-white\/90 .p-6 p {
+            flex: 1;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+
+        .news-card .bg-white\/90 .p-6 .text-center {
+            flex-shrink: 0;
+            margin-top: auto;
+        }
+
+        /* تحسينات للتصميم المتجاوب */
+        @media (max-width: 768px) {
+            .news-card {
+                height: 450px !important;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .news-card {
+                height: 420px !important;
+                max-width: 400px !important;
+                margin: 0 auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .news-card {
+                height: 420px !important;
+                max-width: 360px !important;
+                margin: 0 auto;
+            }
+        }
+        
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        /* Enhanced Hover Effects */
+        .hover-glow:hover {
+            box-shadow: 0 0 30px rgba(255, 193, 7, 0.5);
+        }
+        
+        /* Glass Morphism Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .typing-text {
+                animation: none;
+                border-right: none;
+            }
+        }
+        
+        /* Fix for Arabic Text Clipping */
+        .overflow-visible {
+            overflow: visible !important;
+        }
+        
+        /* Enhanced Arabic Typography */
+        h1, h2, h3, h4, h5, h6 {
+            line-height: 1.4 !important;
+            padding: 0.1em 0 !important;
+        }
+        
+        /* Ensure Arabic text displays properly */
+        .arabic-text {
+            text-rendering: optimizeLegibility;
+            font-feature-settings: "liga" 1, "kern" 1;
+        }
+    </style>
+</head>
+<body class="font-['Cairo'] bg-gray-50">
+    <!-- Combined Header and Hero Section -->
+    <section class="relative bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 overflow-hidden">
+        <!-- Static Gradient Background -->
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900"></div>
+        
+        <!-- Overlay for Text Clarity -->
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
+        
+        <!-- Header Navigation -->
+        <div class="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-32 md:h-36 lg:h-40">
+                <!-- Right: Logo -->
+                <div class="flex items-center flex-shrink-0">
+                    {% if school_settings and school_settings.school_logo %}
+                    <img src="/assets/images/{{ school_settings.school_logo }}" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto drop-shadow-lg ">
+                {% else %}
+                    {% if school_settings and school_settings.school_logo %}
+                    <img src="/assets/images/{{ school_settings.school_logo }}" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto drop-shadow-lg ">
+                {% else %}
+                    <img src="/assets/images/logo.png" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto drop-shadow-lg ">
+                {% endif %}
+                {% endif %}
+                </div>
+                <!-- Center: School Name (always visible) -->
+                <div class="flex-1 flex justify-center">
+                                                            <span class="text-base md:text-3xl font-extrabold text-yellow-400 tracking-wide font-['Cairo','Noto Kufi Arabic',sans-serif] select-none">
+                    {% if school_settings and school_settings.school_name %}
+                        {{ school_settings.school_name }}
+                    {% else %}
+                        سجل بيانات المدرسة من الاعدادات
+                    {% endif %}
+                </span>
+                </div>
+                <!-- Left: Navigation & Hamburger -->
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    <!-- Desktop Nav -->
+                    <nav class="hidden md:flex items-center space-x-1 space-x-reverse mr-4">
+                        <a href="/" class="px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">الرئيسية</a>
+                        <a href="#footer" class="px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">اتصل بنا</a>
+                    </nav>
+                    <!-- Mobile menu button -->
+                    <button id="mobile-menu-button" onclick="toggleMobileMenu()" class="md:hidden flex items-center justify-center w-11 h-11 rounded-lg bg-white/10 text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-yellow-300 transition-all duration-300 cursor-pointer" aria-label="فتح القائمة" type="button">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu" class="hidden md:hidden bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900/95 backdrop-blur-sm border-t border-white/10 z-40 relative">
+            <nav class="flex flex-col py-2 px-4 space-y-1">
+                <a href="/" class="block px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">الرئيسية</a>
+                <a href="#footer" class="block px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">اتصل بنا</a>
+            </nav>
+        </div>
+        
+        <!-- Hero Content -->
+        <div class="relative z-10 container mx-auto px-6 flex flex-col justify-center items-center text-center pb-32">
+            <!-- Main Title with Typing Effect -->
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-8 text-white drop-shadow-2xl leading-relaxed animate-fade-in-up animation-delay-200 overflow-visible mt-16">
+                <span class="typing-text">جميع أخبار المدرسة</span>
+            </h1>
+            
+            <!-- Subtitle -->
+            <p class="text-xl md:text-2xl lg:text-3xl mb-8 max-w-4xl text-white/90 drop-shadow-lg leading-relaxed animate-fade-in-up animation-delay-400">
+                تابع جميع مستجدات وأنشطة مدرستنا
+            </p>
+            
+            <!-- Call to Action Button -->
+            <div class="animate-fade-in-up animation-delay-800 mt-8">
+                <a href="#news-content" class="cta-button group relative inline-flex items-center px-12 py-4 text-xl font-bold text-white bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-full shadow-2xl hover:shadow-yellow-500/25 transition-all duration-500 transform hover:scale-105 hover:-translate-y-1 hover-glow">
+                    <span class="relative z-10">استكشف الأخبار</span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-yellow-600 to-yellow-700 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <svg class="w-6 h-6 mr-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <main>
+        <section id="news-content" class="pt-8 pb-20 bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 relative overflow-hidden">
+            <!-- Background Pattern -->
+            <div class="absolute inset-0 opacity-5">
+                <div class="absolute top-20 left-10 w-32 h-32 bg-blue-400 rounded-full blur-3xl"></div>
+                <div class="absolute bottom-20 right-10 w-40 h-40 bg-purple-400 rounded-full blur-3xl"></div>
+                <div class="absolute top-1/2 left-1/2 w-24 h-24 bg-green-400 rounded-full blur-2xl"></div>
+            </div>
+            
+            <div class="container mx-auto px-6 relative z-10">
+                
+                <!-- News Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                    {% for news in news_list %}
+                    <div class="group relative animate-fade-in-up animation-delay-{{ loop.index * 100 }} news-card">
+                        <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 overflow-hidden">
+                            <!-- News Image -->
+                            <div class="relative overflow-hidden h-48 bg-gradient-to-br from-gray-100 to-gray-200">
+                                {% if news.image %}
+                                <img src="/assets/images/news/{{ news.image }}" alt="صورة الخبر" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500">
+                                {% else %}
+                                <div class="w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
+                                    <svg class="w-16 h-16 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Gradient Overlay -->
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                                
+                                <!-- Date Badge -->
+                                <div class="absolute top-4 right-4">
+                                    <div class="bg-white/90 backdrop-blur-sm text-gray-800 px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+                                        {{ news.date }}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- News Content -->
+                            <div class="p-6">
+                                <!-- News Title -->
+                                <h3 class="text-xl font-bold text-gray-800 mb-3 group-hover:text-blue-600 transition-colors duration-300 leading-relaxed overflow-visible">
+                                    <a href="/news/{{ news.id }}" class="hover:underline">{{ news.title }}</a>
+                                </h3>
+                                
+                                <!-- News Excerpt -->
+                                <p class="text-gray-600 leading-relaxed mb-4 text-right">
+                                    {{ news.details|striptags|truncate(100) }}
+                                </p>
+                                
+                                <!-- Read More Button -->
+                                <div class="text-center">
+                                    <a href="/news/{{ news.id }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                                        اقرأ المزيد
+                                        <svg class="w-4 h-4 mr-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="col-span-full text-center py-16 animate-fade-in-up">
+                        <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-12 shadow-xl">
+                            <svg class="w-24 h-24 text-gray-300 mx-auto mb-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z"/>
+                            </svg>
+                            <h3 class="text-2xl font-bold text-gray-600 mb-2">لا توجد أخبار حالياً</h3>
+                            <p class="text-gray-500">سنقوم بإضافة الأخبار قريباً</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer id="footer" class="bg-gray-800 text-white pt-16 pb-8 mt-12">
+        <div class="container mx-auto px-6">
+            <div class="text-center text-gray-400">&copy; {{ current_year }} 
+                {% if school_settings and school_settings.school_name %}
+                    {{ school_settings.school_name }}
+                {% else %}
+                    سجل بيانات المدرسة من الاعدادات
+                {% endif %}. 
+                جميع الحقوق محفوظة.
+            </div>
+        </div>
+    </footer>
+    <script>
+        // Simple mobile menu function
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu) {
+                mobileMenu.classList.toggle('hidden');
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function () {
+            // Close menu when clicking outside
+            document.addEventListener('click', function(e) {
+                const mobileMenu = document.getElementById('mobile-menu');
+                const menuButton = document.getElementById('mobile-menu-button');
+                
+                if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                    if (!mobileMenu.contains(e.target) && !menuButton?.contains(e.target)) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                }
+            });
+            
+            // Close mobile menu when pressing ESC
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    const mobileMenu = document.getElementById('mobile-menu');
+                    if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                }
+            });
+            
+            // Typing Effect Enhancement
+            const typingText = document.querySelector('.typing-text');
+            if (typingText && window.innerWidth > 768) {
+                const text = typingText.textContent;
+                typingText.textContent = '';
+                let i = 0;
+                
+                function typeWriter() {
+                    if (i < text.length) {
+                        typingText.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, 100);
+                    }
+                }
+                
+                // Start typing after a delay
+                setTimeout(typeWriter, 500);
+            }
+            
+            // Button Hover Effects
+            const ctaButton = document.querySelector('a[href="#news-content"]');
+            if (ctaButton) {
+                ctaButton.addEventListener('mouseenter', () => {
+                    ctaButton.style.boxShadow = '0 20px 40px rgba(255, 193, 7, 0.4)';
+                });
+                
+                ctaButton.addEventListener('mouseleave', () => {
+                    ctaButton.style.boxShadow = '';
+                });
+            }
+            
+            // Smooth Scroll for Navigation Links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

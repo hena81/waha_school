@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إدارة المعلمين</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Typing effect */
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+
+        .typing-text {
+            border-right: 3px solid #fbbf24;
+            white-space: nowrap;
+        }
+
+        /* CTA Button */
+        .cta-button {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Glass effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .typing-text {
+                font-size: 1.5rem;
+                line-height: 2rem;
+            }
+        }
+
+        /* Advanced Animations for Statistics */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes slideInFromTop {
+            0% {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes slideOutToTop {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.9);
+            }
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3) translateY(30px);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05) translateY(-10px);
+            }
+            70% {
+                transform: scale(0.9) translateY(5px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* Stats Toggle Button Enhancements */
+        #statsToggle {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #statsToggle::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        #statsToggle:hover::before {
+            left: 100%;
+        }
+
+        /* Stats Content Container */
+        #statsContent {
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Card Hover Effects */
+        .stats-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-8px) scale(1.05) !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        /* Icon Rotation Animation */
+        #statsToggleIcon {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Glow Effect */
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+    </style>
+</head>
+<body class="font-['Cairo'] bg-gradient-to-br from-blue-50 to-green-100 min-h-screen">
+    <!-- Header & Hero Section -->
+    <section class="relative bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900 text-white overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 bg-black/20"></div>
+        
+        <!-- Header Navigation -->
+        <div class="relative z-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-32 md:h-36 lg:h-40">
+                    <!-- Right: Logo -->
+                    <div class="flex items-center flex-shrink-0">
+                        {% if school_settings and school_settings.school_logo %}
+                    <img src="/assets/images/{{ school_settings.school_logo }}" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto ">
+                {% else %}
+                    {% if school_settings and school_settings.school_logo %}
+                    <img src="/assets/images/{{ school_settings.school_logo }}" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto ">
+                {% else %}
+                    <img src="/assets/images/logo.png" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto ">
+                {% endif %}
+                {% endif %}
+                    </div>
+                    <!-- Center: School Name (always visible) -->
+                    <div class="flex-1 flex justify-center">
+                                        <span class="text-base md:text-3xl font-extrabold text-yellow-400 tracking-wide font-['Cairo','Noto Kufi Arabic',sans-serif] select-none">
+                    {% if school_settings and school_settings.school_name %}
+                        {{ school_settings.school_name }}
+                    {% else %}
+                        سجل بيانات المدرسة من الاعدادات
+                    {% endif %}
+                </span>
+                    </div>
+                    <!-- Left: Navigation & Hamburger -->
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <!-- Desktop Nav -->
+                        <nav class="hidden md:flex items-center space-x-1 space-x-reverse mr-4">
+                            <a href="/admin" class="px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition">لوحة التحكم</a>
+                            <a href="/logout" class="px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition">تسجيل الخروج</a>
+                        </nav>
+                        <!-- Mobile menu button -->
+                        <button onclick="toggleMobileMenu()" class="md:hidden flex items-center justify-center w-11 h-11 rounded-lg bg-white/10 text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 transition" aria-label="فتح القائمة">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white/10 backdrop-blur-md border-t border-white/10 z-40 relative">
+            <nav class="flex flex-col py-2 px-4 space-y-1">
+                <a href="/admin" class="block px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition">لوحة التحكم</a>
+                <a href="/logout" class="block px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition">تسجيل الخروج</a>
+            </nav>
+        </div>
+
+        <!-- Hero Content -->
+        <div class="relative z-10 pb-32">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+                <div class="text-center">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-6 typing-text mt-16">
+                        إدارة المعلمين
+                    </h1>
+                    <p class="text-xl md:text-2xl text-white/80 mb-8 max-w-3xl mx-auto mt-8">
+                        إضافة وإدارة بيانات المعلمين في النظام
+                    </p>
+                    <div class="flex justify-center">
+                        <button class="cta-button bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300">
+                            إضافة معلم جديد
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- أيقونة الرئيسية -->
+    <div class="fixed left-4 top-1/2 transform -translate-y-1/2 z-50">
+        <a href="/admin" class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl">
+            <i class="fas fa-home text-xl"></i>
+        </a>
+    </div>
+
+    <!-- Statistics Section -->
+    <section class="bg-white py-8 shadow-sm">
+        <div class="container mx-auto px-4">
+            <!-- Toggle Button -->
+            <div class="text-center mb-6">
+                <button id="statsToggle" class="group bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                    <span class="flex items-center justify-center">
+                        <i class="fas fa-chart-bar text-xl ml-3"></i>
+                        <span id="statsToggleText">عرض إحصائيات الموظفين</span>
+                        <i id="statsToggleIcon" class="fas fa-chevron-down text-sm mr-3 transform transition-transform duration-300"></i>
+                    </span>
+                </button>
+            </div>
+            
+            <!-- Statistics Content -->
+            <div id="statsContent" class="opacity-0 max-h-0 overflow-hidden transition-all duration-700 ease-in-out transform scale-95">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">إحصائيات الموظفين</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+                <!-- إجمالي الموظفين -->
+                <div class="stats-card bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg p-4 text-center transform transition-all duration-300">
+                    <i class="fas fa-users text-2xl mb-2"></i>
+                    <h3 class="text-lg font-bold">{{ users|length }}</h3>
+                    <p class="text-sm opacity-90">إجمالي الموظفين</p>
+                </div>
+                
+                <!-- المشرفين -->
+                <div class="stats-card bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg p-4 text-center transform transition-all duration-300">
+                    <i class="fas fa-user-shield text-2xl mb-2"></i>
+                    <h3 class="text-lg font-bold">{{ users|selectattr('role', 'equalto', 'مشرف')|list|length }}</h3>
+                    <p class="text-sm opacity-90">المشرفين</p>
+                </div>
+                
+                <!-- مشرفي المحتوى -->
+                <div class="stats-card bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg p-4 text-center transform transition-all duration-300">
+                    <i class="fas fa-user-edit text-2xl mb-2"></i>
+                    <h3 class="text-lg font-bold">{{ users|selectattr('role', 'equalto', 'مشرف محتوى')|list|length }}</h3>
+                    <p class="text-sm opacity-90">مشرفي المحتوى</p>
+                </div>
+                
+                <!-- المستخدمين العاديين -->
+                <div class="stats-card bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-lg p-4 text-center transform transition-all duration-300">
+                    <i class="fas fa-user text-2xl mb-2"></i>
+                    <h3 class="text-lg font-bold">{{ users|selectattr('role', 'equalto', 'عادي')|list|length }}</h3>
+                    <p class="text-sm opacity-90">المستخدمين العاديين</p>
+                </div>
+                
+                <!-- المعلمين -->
+                <div class="stats-card bg-gradient-to-br from-teal-500 to-teal-600 text-white rounded-lg p-4 text-center transform transition-all duration-300">
+                    <i class="fas fa-chalkboard-teacher text-2xl mb-2"></i>
+                    <h3 class="text-lg font-bold">{{ users|selectattr('job_title', 'equalto', 'معلم')|list|length }}</h3>
+                    <p class="text-sm opacity-90">المعلمين</p>
+                </div>
+                
+                <!-- الإداريين -->
+                <div class="stats-card bg-gradient-to-br from-indigo-500 to-indigo-600 text-white rounded-lg p-4 text-center transform transition-all duration-300">
+                    <i class="fas fa-user-tie text-2xl mb-2"></i>
+                    <h3 class="text-lg font-bold">{{ users|selectattr('job_title', 'equalto', 'اداري')|list|length }}</h3>
+                    <p class="text-sm opacity-90">الإداريين</p>
+                </div>
+            </div>
+            
+            <!-- إحصائيات المواد -->
+            <div class="mt-8">
+                <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">توزيع المواد الدراسية</h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+                    {% set subjects_count = {} %}
+                    {% for user in users %}
+                        {% if user.subject %}
+                            {% if subjects_count.update({user.subject: subjects_count.get(user.subject, 0) + 1}) %}{% endif %}
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for subject, count in subjects_count.items() %}
+                    <div class="stats-card bg-gradient-to-br from-gray-100 to-gray-200 text-gray-800 rounded-lg p-3 text-center border border-gray-300 transition-all duration-300">
+                        <i class="fas fa-book text-lg mb-1 text-blue-600"></i>
+                        <h4 class="text-sm font-bold">{{ count }}</h4>
+                        <p class="text-xs opacity-70">{{ subject }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-4 py-8">
+        <form method="POST" class="bg-white rounded-lg shadow-md p-6 mb-8 grid grid-cols-1 md:grid-cols-5 gap-4" id="addUserForm">
+            <input name="civil_id" type="number" maxlength="12" minlength="12" pattern="\\d{12}" required placeholder="الرقم المدني (12 رقم)" class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200">
+            <input name="name" type="text" required placeholder="الاسم" class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200">
+            <select name="subject" id="subjectSelect" required class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200">
+                <option value="" disabled selected>اختر المادة</option>
+                {% for subject in subjects %}
+                <option value="{{ subject }}">{{ subject }}</option>
+                {% endfor %}
+                <option value="__other__">أخرى...</option>
+            </select>
+            <input name="subject_other" id="subjectOtherInput" type="text" placeholder="أدخل مادة جديدة" class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 hidden">
+            <input name="password" type="password" required placeholder="كلمة المرور" class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200">
+            <select name="job_title" required class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200">
+                <option value="" disabled selected>المسمى الوظيفي</option>
+                <option>مدير مدرسة</option>
+                <option>مدير مدرسة مساعد</option>
+                <option>رئيس قسم</option>
+                <option>معلم</option>
+                <option>اداري</option>
+            </select>
+            <select name="role" required class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200">
+                <option value="مشرف">مشرف</option>
+                <option value="مشرف محتوى">مشرف محتوى</option>
+                <option value="عادي">عادي</option>
+            </select>
+            <button type="submit" class="col-span-1 md:col-span-5 bg-blue-600 text-white rounded py-2 mt-2 hover:bg-blue-700 transition">إضافة مستخدم</button>
+        </form>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <ul class="mb-4">
+              {% for category, message in messages %}
+                <li class="text-{{ 'red' if category == 'danger' else 'green' }}-600">{{ message }}</li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+        <div class="mb-4 flex flex-col gap-3">
+            <div class="flex flex-wrap gap-2 justify-center items-center">
+                <form method="POST" action="/admin/users/upload" enctype="multipart/form-data" class="flex gap-2 items-center" id="excelUploadForm">
+                    <input type="file" name="excel_file" accept=".xlsx" required class="border rounded px-2 py-2 text-sm w-44">
+                    <button type="submit" class="bg-green-600 text-white rounded px-6 py-2 text-base font-bold hover:bg-green-700 transition">رفع ملف إكسل</button>
+                </form>
+                <a href="/admin/users/template" class="bg-blue-500 text-white rounded px-6 py-2 text-base font-bold hover:bg-blue-600 transition" download>تحميل قالب إكسل</a>
+            </div>
+            <div class="flex flex-wrap gap-2 justify-center items-center">
+                <input id="filterInput" type="text" placeholder="ابحث بالاسم..." class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 w-64">
+                <select id="subjectFilter" class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 w-48">
+                    <option value="">كل المواد</option>
+                    {% for user in users|unique(attribute='subject') %}
+                    <option value="{{ user.subject }}">{{ user.subject }}</option>
+                    {% endfor %}
+                </select>
+                <select id="roleFilter" class="border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-200 w-40">
+                    <option value="">كل الصلاحيات</option>
+                    <option value="مشرف">مشرف</option>
+                    <option value="مشرف محتوى">مشرف محتوى</option>
+                    <option value="عادي">عادي</option>
+                </select>
+            </div>
+        </div>
+        {% if session.role == 'مشرف' %}
+        {% set normal_users = users|selectattr('role', 'equalto', 'عادي')|list %}
+        {% if normal_users|length > 0 %}
+        <form method="POST" action="/admin/users/delete_all" onsubmit="return confirm('هل أنت متأكد من حذف جميع المستخدمين العاديين؟ لن يتم حذف المشرفين أو مشرفي المحتوى.');" class="mb-4 text-left">
+            <button type="submit" class="bg-red-600 text-white rounded px-6 py-2 text-base font-bold hover:bg-red-700 transition">حذف الكل</button>
+        </form>
+        {% endif %}
+        {% endif %}
+        <div id="progressContainer" class="w-full max-w-md mx-auto mb-4 hidden">
+            <div class="w-full bg-gray-200 rounded-full h-3">
+                <div id="progressBar" class="bg-blue-500 h-3 rounded-full" style="width: 0%"></div>
+            </div>
+            <div id="progressText" class="text-center text-sm mt-1 text-gray-700">جاري رفع الملف...</div>
+        </div>
+        <div class="overflow-x-auto">
+            <table id="usersTable" class="min-w-full bg-white rounded-lg shadow-md">
+                <thead>
+                    <tr>
+                        <th class="py-2 px-4 cursor-pointer" onclick="sortTable(0)">الرقم المدني</th>
+                        <th class="py-2 px-4 cursor-pointer" onclick="sortTable(1)">الاسم</th>
+                        <th class="py-2 px-4 cursor-pointer" onclick="sortTable(2)">المادة</th>
+                        <th class="py-2 px-4">المسمى الوظيفي</th>
+                        <th class="py-2 px-4 cursor-pointer" onclick="sortTable(3)">الصلاحية</th>
+                        <th class="py-2 px-4">تعديل</th>
+                        <th class="py-2 px-4">حذف</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr class="border-b hover:bg-blue-50">
+                        <td class="py-2 px-4">{{ user.civil_id }}</td>
+                        <td class="py-2 px-4">{{ user.name }}</td>
+                        <td class="py-2 px-4">{{ user.subject }}</td>
+                        <td class="py-2 px-4">{{ user.job_title or '-' }}</td>
+                        <td class="py-2 px-4">{{ user.role }}</td>
+                        <td class="py-2 px-4">
+                            <a href="/admin/users/edit/{{ user.civil_id }}" class="text-blue-600 hover:underline">تعديل</a>
+                        </td>
+                        <td class="py-2 px-4">
+                            {% if user.role != 'مشرف' and user.role != 'مشرف محتوى' %}
+                            <form method="POST" action="/admin/users/delete/{{ user.civil_id }}" onsubmit="return confirm('هل أنت متأكد من حذف المستخدم؟');">
+                                <button type="submit" class="text-red-600 hover:underline">حذف</button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+    // ترتيب الجدول بالضغط على رؤوس الأعمدة
+    function sortTable(n) {
+        var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+        table = document.getElementById("usersTable");
+        switching = true;
+        dir = "asc";
+        while (switching) {
+            switching = false;
+            rows = table.rows;
+            for (i = 1; i < (rows.length - 1); i++) {
+                shouldSwitch = false;
+                x = rows[i].getElementsByTagName("TD")[n];
+                y = rows[i + 1].getElementsByTagName("TD")[n];
+                if (dir == "asc") {
+                    if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                } else if (dir == "desc") {
+                    if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                        shouldSwitch = true;
+                        break;
+                    }
+                }
+            }
+            if (shouldSwitch) {
+                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                switching = true;
+                switchcount++;
+            } else {
+                if (switchcount == 0 && dir == "asc") {
+                    dir = "desc";
+                    switching = true;
+                }
+            }
+        }
+    }
+    function normalizeArabic(str) {
+        // إزالة التشكيل والمسافات وتوحيد الحروف
+        return str
+            .replace(/[\u064B-\u0652]/g, '') // Remove tashkeel
+            .replace(/\s+/g, '') // Remove spaces
+            .replace(/[أإآا]/g, 'ا')
+            .replace(/[ة]/g, 'ه')
+            .replace(/[ى]/g, 'ي')
+            .toLowerCase();
+    }
+    // فلترة المستخدمين بالاسم والمادة والصلاحية (إصلاح الفلترة)
+    function filterUsers() {
+        var nameFilter = document.getElementById('filterInput').value.trim();
+        var subjectFilter = document.getElementById('subjectFilter').value;
+        var roleFilter = document.getElementById('roleFilter').value;
+        var table = document.getElementById('usersTable');
+        var trs = table.getElementsByTagName('tr');
+        for (var i = 1; i < trs.length; i++) {
+            var tds = trs[i].getElementsByTagName('td');
+            if (tds.length < 5) continue; // تأكد من وجود أعمدة كافية
+            var name = tds[1].textContent || tds[1].innerText;
+            var show = true;
+            if (nameFilter) {
+                var normalizedName = normalizeArabic(name);
+                var normalizedFilter = normalizeArabic(nameFilter);
+                show = normalizedName.includes(normalizedFilter);
+            }
+            var subject = tds[2].textContent || tds[2].innerText;
+            var role = tds[4].textContent || tds[4].innerText; // الصلاحية في العمود الرابع (index 4)
+            if (subjectFilter && subject !== subjectFilter) show = false;
+            if (roleFilter && role !== roleFilter) show = false;
+            trs[i].style.display = show ? '' : 'none';
+        }
+    }
+    document.getElementById('filterInput').addEventListener('input', filterUsers);
+    document.getElementById('subjectFilter').addEventListener('change', filterUsers);
+    document.getElementById('roleFilter').addEventListener('change', filterUsers);
+    // إظهار input عند اختيار "أخرى..." في المادة
+    document.getElementById('subjectSelect').addEventListener('change', function() {
+        var otherInput = document.getElementById('subjectOtherInput');
+        if (this.value === '__other__') {
+            otherInput.classList.remove('hidden');
+            otherInput.required = true;
+        } else {
+            otherInput.classList.add('hidden');
+            otherInput.required = false;
+        }
+    });
+    // عند إرسال النموذج، إذا تم اختيار "أخرى..."، انسخ قيمة input للمادة
+    document.getElementById('addUserForm').addEventListener('submit', function(e) {
+        var subjectSelect = document.getElementById('subjectSelect');
+        var otherInput = document.getElementById('subjectOtherInput');
+        if (subjectSelect.value === '__other__') {
+            if (otherInput.value.trim() !== '') {
+                subjectSelect.value = otherInput.value.trim();
+            }
+        }
+    });
+    // شريط التقدم عند رفع ملف إكسل
+    document.getElementById('excelUploadForm').addEventListener('submit', function(e) {
+        var form = this;
+        var fileInput = form.querySelector('input[type="file"]');
+        if (!fileInput.files.length) return;
+        e.preventDefault();
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', form.action, true);
+        var formData = new FormData(form);
+        xhr.onload = function() {
+            // بعد رفع الملف، أظهر شريط التقدم وابدأ التحريك التدريجي
+            var progressContainer = document.getElementById('progressContainer');
+            var progressBar = document.getElementById('progressBar');
+            var progressText = document.getElementById('progressText');
+            progressContainer.classList.remove('hidden');
+            var percent = 0;
+            progressBar.style.width = '0%';
+            progressText.textContent = 'جاري معالجة البيانات...';
+            var interval = setInterval(function() {
+                percent += Math.random() * 15 + 5; // تقدم عشوائي سريع
+                if (percent >= 100) {
+                    percent = 100;
+                    clearInterval(interval);
+                    progressText.textContent = 'تمت المعالجة! سيتم إعادة تحميل الصفحة...';
+                    setTimeout(function() { window.location.reload(); }, 800);
+                }
+                progressBar.style.width = percent + '%';
+            }, 120);
+        };
+        xhr.send(formData);
+    });
+    </script>
+    <script>
+        // Mobile menu toggle function
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu) {
+                mobileMenu.classList.toggle('hidden');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Statistics Toggle Functionality
+            const statsToggle = document.getElementById('statsToggle');
+            const statsContent = document.getElementById('statsContent');
+            const statsToggleText = document.getElementById('statsToggleText');
+            const statsToggleIcon = document.getElementById('statsToggleIcon');
+            let isStatsVisible = false;
+
+            // Load saved state from localStorage
+            const savedStatsState = localStorage.getItem('statsVisible');
+            if (savedStatsState === 'true') {
+                showStats();
+            }
+
+            statsToggle.addEventListener('click', function() {
+                if (isStatsVisible) {
+                    hideStats();
+                } else {
+                    showStats();
+                }
+            });
+
+            function showStats() {
+                isStatsVisible = true;
+                
+                // Update button text and icon
+                statsToggleText.textContent = 'إخفاء إحصائيات الموظفين';
+                statsToggleIcon.style.transform = 'rotate(180deg)';
+                
+                // Animate content appearance
+                statsContent.style.maxHeight = '1000px';
+                statsContent.style.opacity = '1';
+                statsContent.style.transform = 'scale(1)';
+                
+                // Add stagger animation to cards
+                setTimeout(() => {
+                    const cards = statsContent.querySelectorAll('.grid > div');
+                    cards.forEach((card, index) => {
+                        setTimeout(() => {
+                            card.style.transform = 'translateY(0) scale(1)';
+                            card.style.opacity = '1';
+                        }, index * 100);
+                    });
+                }, 100);
+                
+                // Save state
+                localStorage.setItem('statsVisible', 'true');
+                
+                // Add pulse effect to button
+                statsToggle.style.animation = 'pulse 0.5s ease-in-out';
+                setTimeout(() => {
+                    statsToggle.style.animation = '';
+                }, 500);
+            }
+
+            function hideStats() {
+                isStatsVisible = false;
+                
+                // Update button text and icon
+                statsToggleText.textContent = 'عرض إحصائيات الموظفين';
+                statsToggleIcon.style.transform = 'rotate(0deg)';
+                
+                // Animate content disappearance
+                const cards = statsContent.querySelectorAll('.grid > div');
+                cards.forEach((card, index) => {
+                    setTimeout(() => {
+                        card.style.transform = 'translateY(-20px) scale(0.9)';
+                        card.style.opacity = '0';
+                    }, index * 50);
+                });
+                
+                setTimeout(() => {
+                    statsContent.style.maxHeight = '0';
+                    statsContent.style.opacity = '0';
+                    statsContent.style.transform = 'scale(0.95)';
+                }, 300);
+                
+                // Save state
+                localStorage.setItem('statsVisible', 'false');
+            }
+
+            // Initialize card animations
+            const cards = statsContent.querySelectorAll('.grid > div');
+            cards.forEach(card => {
+                card.style.transform = 'translateY(20px) scale(0.9)';
+                card.style.opacity = '0';
+                card.style.transition = 'all 0.3s ease-in-out';
+            });
+
+            // Handle outside clicks to close mobile menu
+            document.addEventListener('click', function(e) {
+                const mobileMenu = document.getElementById('mobile-menu');
+                const mobileMenuButton = document.querySelector('[onclick="toggleMobileMenu()"]');
+                
+                if (mobileMenu && !mobileMenu.contains(e.target) && !mobileMenuButton.contains(e.target)) {
+                    mobileMenu.classList.add('hidden');
+                }
+            });
+
+            // Handle ESC key to close mobile menu
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    const mobileMenu = document.getElementById('mobile-menu');
+                    if (mobileMenu) {
+                        mobileMenu.classList.add('hidden');
+                    }
+                }
+            });
+
+            // Typing effect
+            const typingText = document.querySelector('.typing-text');
+            if (typingText) {
+                const text = typingText.textContent;
+                typingText.textContent = '';
+                
+                let i = 0;
+                const typeWriter = () => {
+                    if (i < text.length) {
+                        typingText.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, 100);
+                    }
+                };
+                typeWriter();
+            }
+
+            // Button hover effects
+            const ctaButton = document.querySelector('.cta-button');
+            if (ctaButton) {
+                ctaButton.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-4px) scale(1.05)';
+                });
+                
+                ctaButton.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            }
+
+            // Enhanced button interactions
+            statsToggle.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05) translateY(-2px)';
+                this.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.2)';
+            });
+
+            statsToggle.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1) translateY(0)';
+                this.style.boxShadow = '0 10px 25px rgba(0, 0, 0, 0.15)';
+            });
+        });
+    </script>
+</body>
+</html> 

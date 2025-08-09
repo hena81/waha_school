@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رفع المواد التعليمية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Noto+Kufi+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { font-family: 'Cairo', 'Noto Kufi Arabic', sans-serif; }
+
+        /* Typing effect */
+        @keyframes typing {
+            from { width: 0; }
+            to { width: 100%; }
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+
+        .typing-text {
+            border-right: 3px solid #fbbf24;
+            white-space: nowrap;
+            animation: typing 3s steps(40, end), blink 0.75s step-end infinite;
+        }
+
+        /* CTA Button */
+        .cta-button {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Glass effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .typing-text {
+                font-size: 1.5rem;
+                line-height: 2rem;
+            }
+        }
+
+        /* Advanced Animations for Statistics */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes slideInFromTop {
+            0% {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.9);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes slideOutToTop {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-30px) scale(0.9);
+            }
+        }
+
+        @keyframes bounceIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.3) translateY(30px);
+            }
+            50% {
+                opacity: 1;
+                transform: scale(1.05) translateY(-10px);
+            }
+            70% {
+                transform: scale(0.9) translateY(5px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        /* Stats Toggle Button Enhancements */
+        #statsToggle {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        #statsToggle::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        #statsToggle:hover::before {
+            left: 100%;
+        }
+
+        /* Stats Content Container */
+        #statsContent {
+            transition: all 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Card Hover Effects */
+        .stats-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+        .stats-card:hover {
+            transform: translateY(-8px) scale(1.05) !important;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        /* Icon Rotation Animation */
+        #statsToggleIcon {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Glow Effect */
+        .glow-effect {
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Header & Hero Section -->
+    <section class="relative bg-gradient-to-br from-gray-900 via-blue-900 to-indigo-900 text-white overflow-hidden">
+        <!-- Background Pattern -->
+        <div class="absolute inset-0 bg-black/20"></div>
+        
+        <!-- Header Navigation -->
+        <div class="relative z-20">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-32 md:h-36 lg:h-40">
+                    <!-- Right: Logo -->
+                    <div class="flex items-center flex-shrink-0">
+                        {% if school_settings and school_settings.school_logo %}
+                            <img src="/assets/images/{{ school_settings.school_logo }}" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto">
+                        {% else %}
+                            <img src="/assets/images/logo.png" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto">
+                        {% endif %}
+                    </div>
+                    <!-- Center: School Name (always visible) -->
+                    <div class="flex-1 flex justify-center">
+                                        <span class="text-base md:text-3xl font-extrabold text-yellow-400 tracking-wide font-['Cairo','Noto Kufi Arabic',sans-serif] select-none">
+                    {% if school_settings and school_settings.school_name %}
+                        {{ school_settings.school_name }}
+                    {% else %}
+                        سجل بيانات المدرسة من الاعدادات
+                    {% endif %}
+                </span>
+                    </div>
+                    <!-- Left: Navigation & Hamburger -->
+                    <div class="flex items-center space-x-2 space-x-reverse">
+                        <!-- Desktop Nav -->
+                        <nav class="hidden md:flex items-center space-x-1 space-x-reverse mr-4">
+                            <a href="/admin" class="px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition">لوحة التحكم</a>
+                        </nav>
+                        <!-- Mobile menu button -->
+                        <button onclick="toggleMobileMenu()" class="md:hidden flex items-center justify-center w-11 h-11 rounded-lg bg-white/10 text-white hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/50 transition" aria-label="فتح القائمة">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white/10 backdrop-blur-md border-t border-white/10 z-40 relative">
+            <nav class="flex flex-col py-2 px-4 space-y-1">
+                <a href="/admin" class="block px-3 py-2 rounded-md text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition">لوحة التحكم</a>
+            </nav>
+        </div>
+
+        <!-- Hero Content -->
+        <div class="relative z-10 pb-32">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20">
+                <div class="text-center">
+                    <h1 class="text-4xl md:text-6xl font-bold mb-6 typing-text mt-16">
+                        رفع المواد التعليمية
+                    </h1>
+                    <p class="text-xl md:text-2xl text-white/80 mb-8 max-w-3xl mx-auto mt-8">
+                        رفع وإدارة المواد التعليمية للطلاب
+                    </p>
+                    <div class="flex justify-center">
+                        <button class="cta-button bg-gradient-to-r from-yellow-400 to-orange-500 text-gray-900 px-8 py-4 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300">
+                            رفع مادة جديدة
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- أيقونة الرئيسية -->
+    <div class="fixed left-4 top-1/2 transform -translate-y-1/2 z-50">
+        <a href="/admin" class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 p-3 rounded-full shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl">
+            <i class="fas fa-home text-xl"></i>
+        </a>
+    </div>
+
+    <!-- Statistics Section -->
+    <section class="bg-white py-8 shadow-sm">
+        <div class="container mx-auto px-4">
+            <!-- Toggle Button -->
+            <div class="text-center mb-6">
+                <button id="statsToggle" class="group bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-300">
+                    <span class="flex items-center justify-center">
+                        <i class="fas fa-chart-line text-xl ml-3"></i>
+                        <span id="statsToggleText">عرض إحصائيات المواد التعليمية</span>
+                        <i id="statsToggleIcon" class="fas fa-chevron-down text-sm mr-3 transform transition-transform duration-300"></i>
+                    </span>
+                </button>
+            </div>
+            
+            <!-- Statistics Content -->
+            <div id="statsContent" class="opacity-0 max-h-0 overflow-hidden transition-all duration-700 ease-in-out transform scale-95">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">إحصائيات المواد التعليمية</h2>
+                
+                <!-- إحصائيات عامة -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <!-- إجمالي المواد -->
+                    <div class="stats-card bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg p-4 text-center transform transition-all duration-300">
+                        <i class="fas fa-file-alt text-2xl mb-2"></i>
+                        <h3 class="text-lg font-bold">{{ materials|length }}</h3>
+                        <p class="text-sm opacity-90">إجمالي المواد</p>
+                    </div>
+                    
+                    <!-- مواد PDF -->
+                    <div class="stats-card bg-gradient-to-br from-red-500 to-red-600 text-white rounded-lg p-4 text-center transform transition-all duration-300">
+                        <i class="fas fa-file-pdf text-2xl mb-2"></i>
+                        <h3 class="text-lg font-bold">{{ materials|selectattr('material_type', 'equalto', 'PDF')|list|length }}</h3>
+                        <p class="text-sm opacity-90">مواد PDF</p>
+                    </div>
+                    
+                    <!-- مواد الفيديو -->
+                    <div class="stats-card bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg p-4 text-center transform transition-all duration-300">
+                        <i class="fas fa-video text-2xl mb-2"></i>
+                        <h3 class="text-lg font-bold">{{ materials|selectattr('material_type', 'equalto', 'فيديو')|list|length }}</h3>
+                        <p class="text-sm opacity-90">مواد فيديو</p>
+                    </div>
+                    
+                    <!-- المراحل المتاحة -->
+                    <div class="stats-card bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg p-4 text-center transform transition-all duration-300">
+                        <i class="fas fa-layer-group text-2xl mb-2"></i>
+                        {% set unique_stages = materials|map(attribute='stage')|unique|list %}
+                        <h3 class="text-lg font-bold">{{ unique_stages|length }}</h3>
+                        <p class="text-sm opacity-90">مراحل دراسية</p>
+                    </div>
+                </div>
+                
+                <!-- إحصائيات المراحل -->
+                <div class="mb-8">
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">إحصائيات المراحل الدراسية</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                        {% set stage_order = ['10', '11 أدبي', '11 علمي', '12 أدبي', '12 علمي'] %}
+                        {% for stage in stage_order %}
+                            {% if stage in unique_stages %}
+                            {% set stage_materials = materials|selectattr('stage', 'equalto', stage)|list %}
+                            {% set stage_pdf_count = stage_materials|selectattr('material_type', 'equalto', 'PDF')|list|length %}
+                            {% set stage_video_count = stage_materials|selectattr('material_type', 'equalto', 'فيديو')|list|length %}
+                            <div class="stats-card bg-gradient-to-br from-indigo-100 to-indigo-200 text-gray-800 rounded-lg p-4 text-center border border-indigo-300 transition-all duration-300">
+                                <i class="fas fa-graduation-cap text-2xl mb-2 text-indigo-600"></i>
+                                <h4 class="text-lg font-bold text-indigo-800">{{ stage }}</h4>
+                                <div class="mt-2 space-y-1">
+                                    <p class="text-sm"><span class="font-semibold">المواد:</span> {{ stage_materials|length }}</p>
+                                    <div class="flex justify-center space-x-4 space-x-reverse text-xs">
+                                        <span class="bg-red-100 text-red-800 px-2 py-1 rounded">PDF: {{ stage_pdf_count }}</span>
+                                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded">فيديو: {{ stage_video_count }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- تفاصيل المواد لكل مرحلة -->
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800 mb-4 text-center">تفاصيل المواد حسب المادة الدراسية</h3>
+                    <div class="space-y-6">
+                        {% for stage in stage_order %}
+                            {% if stage in unique_stages %}
+                            {% set stage_materials = materials|selectattr('stage', 'equalto', stage)|list %}
+                            {% set stage_subjects = stage_materials|map(attribute='subject')|unique|list %}
+                            
+                            <div class="bg-gray-50 rounded-lg p-4">
+                                <h4 class="text-lg font-bold text-gray-800 mb-3 text-center bg-indigo-600 text-white py-2 px-4 rounded-lg">
+                                    <i class="fas fa-graduation-cap ml-2"></i>
+                                    {{ stage }}
+                                </h4>
+                                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+                                    {% for subject in stage_subjects %}
+                                        {% set subject_materials = stage_materials|selectattr('subject', 'equalto', subject)|list %}
+                                        {% set subject_pdf_count = subject_materials|selectattr('material_type', 'equalto', 'PDF')|list|length %}
+                                        {% set subject_video_count = subject_materials|selectattr('material_type', 'equalto', 'فيديو')|list|length %}
+                                        
+                                        <div class="stats-card bg-gradient-to-br from-white to-gray-100 text-gray-800 rounded-lg p-3 text-center border border-gray-200 transition-all duration-300">
+                                            <i class="fas fa-book text-lg mb-1 text-purple-600"></i>
+                                            <h5 class="text-sm font-bold text-purple-800">{{ subject }}</h5>
+                                            <p class="text-xs opacity-70 mb-2">{{ subject_materials|length }} مادة</p>
+                                            <div class="flex justify-center space-x-2 space-x-reverse">
+                                                {% if subject_pdf_count > 0 %}
+                                                <span class="bg-red-100 text-red-700 text-xs px-1 py-0.5 rounded">PDF: {{ subject_pdf_count }}</span>
+                                                {% endif %}
+                                                {% if subject_video_count > 0 %}
+                                                <span class="bg-blue-100 text-blue-700 text-xs px-1 py-0.5 rounded">فيديو: {{ subject_video_count }}</span>
+                                                {% endif %}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="mb-4 p-4 rounded-lg {% if 'error' in message.lower() %}bg-red-100 text-red-700 border border-red-300{% else %}bg-green-100 text-green-700 border border-green-300{% endif %}">
+                            {{ message | safe }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" enctype="multipart/form-data" class="space-y-6">
+                <!-- اختيار المرحلة الدراسية -->
+                <div>
+                    <label for="stage" class="block text-sm font-medium text-gray-700 mb-2">المرحلة الدراسية</label>
+                    <select id="stage" name="stage" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-500">
+                        <option value="" disabled selected>اختر المرحلة الدراسية</option>
+                        <option value="10">10</option>
+                        <option value="11 أدبي">11 أدبي</option>
+                        <option value="11 علمي">11 علمي</option>
+                        <option value="12 أدبي">12 أدبي</option>
+                        <option value="12 علمي">12 علمي</option>
+                    </select>
+                </div>
+
+                <!-- قائمة المواد (تظهر بعد اختيار المرحلة) -->
+                <div id="subjects-container" class="hidden">
+                    <label for="subject" class="block text-sm font-medium text-gray-700 mb-2">المادة</label>
+                    <select id="subject" name="subject" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-500">
+                        <option value="" disabled selected>اختر المادة</option>
+                    </select>
+                </div>
+
+                <!-- عنوان المادة التعليمية -->
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-700 mb-2">عنوان المادة التعليمية</label>
+                    <input type="text" id="title" name="title" required placeholder="أدخل عنوان المادة التعليمية" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-500">
+                </div>
+
+                <!-- وصف مختصر -->
+                <div>
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-2">وصف مختصر</label>
+                    <textarea id="description" name="description" placeholder="أدخل وصف مختصر للمادة التعليمية (اختياري)" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-500"></textarea>
+                </div>
+
+                <!-- نوع المادة -->
+                <div>
+                    <label for="material_type" class="block text-sm font-medium text-gray-700 mb-2">نوع المادة</label>
+                    <select id="material_type" name="material_type" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-500">
+                        <option value="" disabled selected>اختر نوع المادة</option>
+                        <option value="PDF">PDF</option>
+                        <option value="فيديو">رابط فيديو</option>
+                    </select>
+                </div>
+
+                <!-- حقل رفع الملف (يظهر عند اختيار PDF) -->
+                <div id="file_upload_container" class="hidden">
+                    <label for="file" class="block text-sm font-medium text-gray-700 mb-2">رفع ملف PDF</label>
+                    <input type="file" id="file" name="file" accept=".pdf" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-500">
+                    <p class="text-sm text-gray-500 mt-1">يُسمح برفع ملفات PDF فقط</p>
+                </div>
+
+                <!-- حقل رابط الفيديو (يظهر عند اختيار فيديو) -->
+                <div id="video_url_container" class="hidden">
+                    <label for="video_url" class="block text-sm font-medium text-gray-700 mb-2">رابط الفيديو</label>
+                    <input type="url" id="video_url" name="video_url" placeholder="أدخل رابط الفيديو من YouTube" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-200 focus:border-purple-500">
+                    <div class="mt-2 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                        <p class="text-sm text-blue-800 mb-2"><strong>ملاحظة:</strong> يمكنك استخدام أي من هذه الصيغ:</p>
+                        <ul class="text-xs text-blue-700 space-y-1 mr-4">
+                            <li>• https://www.youtube.com/watch?v=VIDEO_ID</li>
+                            <li>• https://youtu.be/VIDEO_ID</li>
+                            <li>• https://www.youtube.com/embed/VIDEO_ID</li>
+                        </ul>
+                        <p class="text-xs text-blue-600 mt-2">سيتم تحويل الرابط تلقائياً إلى الصيغة المناسبة للعرض.</p>
+                    </div>
+                </div>
+
+                <!-- زر الحفظ -->
+                <div class="flex justify-center">
+                    <button type="submit" class="bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-purple-200">
+                        حفظ المادة التعليمية
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- جدول المواد المرفوعة -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mt-8">
+            <h2 class="text-xl font-bold text-gray-800 mb-6 text-center">المواد المرفوعة</h2>
+            
+            <!-- أدوات التصفية -->
+            <div class="mb-6 flex flex-wrap gap-4 justify-center items-center">
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    <label for="filter-stage" class="text-sm font-medium text-gray-700">المرحلة:</label>
+                    <select id="filter-stage" class="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-200">
+                        <option value="">جميع المراحل</option>
+                        <option value="10">10</option>
+                        <option value="11 أدبي">11 أدبي</option>
+                        <option value="11 علمي">11 علمي</option>
+                        <option value="12 أدبي">12 أدبي</option>
+                        <option value="12 علمي">12 علمي</option>
+                    </select>
+                </div>
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    <label for="filter-subject" class="text-sm font-medium text-gray-700">المادة:</label>
+                    <select id="filter-subject" class="px-3 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-200">
+                        <option value="">جميع المواد</option>
+                    </select>
+                </div>
+                {% if session.role == 'مشرف' %}
+                <form method="POST" action="/admin/upload_materials/delete_all" onsubmit="return confirm('هل أنت متأكد من حذف جميع المواد التعليمية؟ هذا الإجراء لا يمكن التراجع عنه.');" class="flex-shrink-0">
+                    <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition font-bold text-sm">
+                        🗑️ حذف الكل
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+
+            <!-- الجدول -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border border-gray-300 rounded-lg">
+                    <thead class="bg-purple-50">
+                        <tr>
+                            <th class="py-3 px-4 text-right border-b border-gray-300 font-semibold text-gray-700">المرحلة</th>
+                            <th class="py-3 px-4 text-right border-b border-gray-300 font-semibold text-gray-700">المادة</th>
+                            <th class="py-3 px-4 text-right border-b border-gray-300 font-semibold text-gray-700">العنوان</th>
+                            <th class="py-3 px-4 text-right border-b border-gray-300 font-semibold text-gray-700">الوصف</th>
+                            <th class="py-3 px-4 text-right border-b border-gray-300 font-semibold text-gray-700">النوع</th>
+                            <th class="py-3 px-4 text-right border-b border-gray-300 font-semibold text-gray-700">تاريخ الرفع</th>
+                            <th class="py-3 px-4 text-right border-b border-gray-300 font-semibold text-gray-700">الإجراءات</th>
+                        </tr>
+                    </thead>
+                    <tbody id="materials-table-body">
+                        {% for material in materials %}
+                        <tr class="hover:bg-gray-50 material-row" data-stage="{{ material.stage }}" data-subject="{{ material.subject }}">
+                            <td class="py-3 px-4 border-b border-gray-200">{{ material.stage }}</td>
+                            <td class="py-3 px-4 border-b border-gray-200">{{ material.subject }}</td>
+                            <td class="py-3 px-4 border-b border-gray-200">{{ material.title }}</td>
+                            <td class="py-3 px-4 border-b border-gray-200">
+                                {% if material.description %}
+                                    {{ material.description[:50] }}{% if material.description|length > 50 %}...{% endif %}
+                                {% else %}
+                                    <span class="text-gray-400">لا يوجد وصف</span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4 border-b border-gray-200">
+                                {% if material.material_type == 'PDF' %}
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                        PDF
+                                    </span>
+                                {% else %}
+                                    <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                        فيديو
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="py-3 px-4 border-b border-gray-200 text-sm text-gray-600">
+                                {{ material.upload_date.strftime('%Y-%m-%d %H:%M') if material.upload_date else '-' }}
+                            </td>
+                            <td class="py-3 px-4 border-b border-gray-200">
+                                <div class="flex space-x-2 space-x-reverse">
+                                    {% if material.material_type == 'PDF' and material.file_path %}
+                                        <a href="/assets/materials/{{ material.file_path.split('/')[-1] }}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm">عرض</a>
+                                    {% elif material.material_type == 'فيديو' and material.video_url %}
+                                        <a href="{{ material.video_url }}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm">عرض</a>
+                                    {% endif %}
+                                                                          {% if session.role == 'مشرف' or session.role == 'مشرف محتوى' %}
+                                      <form method="POST" action="/admin/upload_materials/delete/{{ material.id }}" class="inline" onsubmit="return confirm('هل أنت متأكد من حذف هذه المادة؟')">
+                                          <button type="submit" class="text-red-600 hover:text-red-800 text-sm">حذف</button>
+                                      </form>
+                                      {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // البيانات من الخادم
+        const subjectsData = JSON.parse('{{ subjects_data | tojson | safe }}');
+        
+        // عناصر DOM
+        const stageSelect = document.getElementById('stage');
+        const subjectsContainer = document.getElementById('subjects-container');
+        const subjectSelect = document.getElementById('subject');
+        const materialTypeSelect = document.getElementById('material_type');
+        const fileUploadContainer = document.getElementById('file_upload_container');
+        const videoUrlContainer = document.getElementById('video_url_container');
+        const fileInput = document.getElementById('file');
+        const videoUrlInput = document.getElementById('video_url');
+
+        // عند تغيير المرحلة
+        stageSelect.addEventListener('change', function() {
+            const selectedStage = this.value;
+            if (selectedStage && subjectsData[selectedStage]) {
+                // إظهار قائمة المواد
+                subjectsContainer.classList.remove('hidden');
+                
+                // ملء قائمة المواد
+                subjectSelect.innerHTML = '<option value="" disabled selected>اختر المادة</option>';
+                subjectsData[selectedStage].forEach(subject => {
+                    const option = document.createElement('option');
+                    option.value = subject;
+                    option.textContent = subject;
+                    subjectSelect.appendChild(option);
+                });
+            } else {
+                subjectsContainer.classList.add('hidden');
+            }
+        });
+
+        // عند تغيير نوع المادة
+        materialTypeSelect.addEventListener('change', function() {
+            const selectedType = this.value;
+            
+            // إخفاء جميع الحقول
+            fileUploadContainer.classList.add('hidden');
+            videoUrlContainer.classList.add('hidden');
+            
+            // إظهار الحقل المناسب
+            if (selectedType === 'PDF') {
+                fileUploadContainer.classList.remove('hidden');
+                fileInput.required = true;
+                videoUrlInput.required = false;
+            } else if (selectedType === 'فيديو') {
+                videoUrlContainer.classList.remove('hidden');
+                videoUrlInput.required = true;
+                fileInput.required = false;
+            }
+        });
+
+        // التصفية
+        const filterStage = document.getElementById('filter-stage');
+        const filterSubject = document.getElementById('filter-subject');
+        const materialRows = document.querySelectorAll('.material-row');
+
+        // ملء قائمة المواد للتصفية
+        const allSubjects = new Set();
+        materialRows.forEach(row => {
+            allSubjects.add(row.dataset.subject);
+        });
+        
+        allSubjects.forEach(subject => {
+            const option = document.createElement('option');
+            option.value = subject;
+            option.textContent = subject;
+            filterSubject.appendChild(option);
+        });
+
+        function filterMaterials() {
+            const selectedStage = filterStage.value;
+            const selectedSubject = filterSubject.value;
+
+            materialRows.forEach(row => {
+                const stage = row.dataset.stage;
+                const subject = row.dataset.subject;
+                
+                const stageMatch = !selectedStage || stage === selectedStage;
+                const subjectMatch = !selectedSubject || subject === selectedSubject;
+                
+                if (stageMatch && subjectMatch) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        filterStage.addEventListener('change', filterMaterials);
+        filterSubject.addEventListener('change', filterMaterials);
+
+        // تحسين رسالة تأكيد حذف الكل
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteAllForm = document.querySelector('form[action="/admin/upload_materials/delete_all"]');
+            if (deleteAllForm) {
+                deleteAllForm.addEventListener('submit', function(e) {
+                    const materialCount = document.querySelectorAll('.material-row').length;
+                    if (materialCount === 0) {
+                        e.preventDefault();
+                        alert('لا توجد مواد تعليمية لحذفها');
+                        return false;
+                    }
+                    
+                    const confirmed = confirm(`هل أنت متأكد من حذف جميع المواد التعليمية (${materialCount} مادة)؟\n\n⚠️ تحذير: هذا الإجراء لا يمكن التراجع عنه!\n\nسيتم حذف جميع الملفات والروابط المرتبطة.`);
+                    if (!confirmed) {
+                        e.preventDefault();
+                        return false;
+                    }
+                });
+            }
+        });
+
+        // تبديل عرض القائمة المنسدلة للجوال
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+        
+        // إغلاق القائمة عند النقر خارجها والضغط على ESC
+        document.addEventListener('click', function(event) {
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuButton = event.target.closest('button[onclick="toggleMobileMenu()"]');
+            
+            if (!mobileMenu.contains(event.target) && !mobileMenuButton) {
+                mobileMenu.classList.add('hidden');
+            }
+        });
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                const mobileMenu = document.getElementById('mobile-menu');
+                mobileMenu.classList.add('hidden');
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Statistics Toggle Functionality
+            const statsToggle = document.getElementById('statsToggle');
+            const statsContent = document.getElementById('statsContent');
+            const statsToggleText = document.getElementById('statsToggleText');
+            const statsToggleIcon = document.getElementById('statsToggleIcon');
+            let isStatsVisible = false;
+
+            // Load saved state from localStorage
+            const savedStatsState = localStorage.getItem('materialsStatsVisible');
+            if (savedStatsState === 'true') {
+                showStats();
+            }
+
+            if (statsToggle) {
+                statsToggle.addEventListener('click', function() {
+                    if (isStatsVisible) {
+                        hideStats();
+                    } else {
+                        showStats();
+                    }
+                });
+            }
+
+            function showStats() {
+                isStatsVisible = true;
+                
+                // Update button text and icon
+                statsToggleText.textContent = 'إخفاء إحصائيات المواد التعليمية';
+                statsToggleIcon.style.transform = 'rotate(180deg)';
+                
+                // Animate content appearance
+                statsContent.style.maxHeight = '3000px';
+                statsContent.style.opacity = '1';
+                statsContent.style.transform = 'scale(1)';
+                
+                // Add stagger animation to cards
+                setTimeout(() => {
+                    const cards = statsContent.querySelectorAll('.stats-card');
+                    cards.forEach((card, index) => {
+                        setTimeout(() => {
+                            card.style.transform = 'translateY(0) scale(1)';
+                            card.style.opacity = '1';
+                        }, index * 50);
+                    });
+                }, 100);
+                
+                // Save state
+                localStorage.setItem('materialsStatsVisible', 'true');
+                
+                // Add pulse effect to button
+                statsToggle.style.animation = 'pulse 0.5s ease-in-out';
+                setTimeout(() => {
+                    statsToggle.style.animation = '';
+                }, 500);
+            }
+
+            function hideStats() {
+                isStatsVisible = false;
+                
+                // Update button text and icon
+                statsToggleText.textContent = 'عرض إحصائيات المواد التعليمية';
+                statsToggleIcon.style.transform = 'rotate(0deg)';
+                
+                // Animate content disappearance
+                const cards = statsContent.querySelectorAll('.stats-card');
+                cards.forEach((card, index) => {
+                    setTimeout(() => {
+                        card.style.transform = 'translateY(-20px) scale(0.9)';
+                        card.style.opacity = '0';
+                    }, index * 30);
+                });
+                
+                setTimeout(() => {
+                    statsContent.style.maxHeight = '0';
+                    statsContent.style.opacity = '0';
+                    statsContent.style.transform = 'scale(0.95)';
+                }, 300);
+                
+                // Save state
+                localStorage.setItem('materialsStatsVisible', 'false');
+            }
+
+            // Initialize card animations
+            const cards = statsContent.querySelectorAll('.stats-card');
+            cards.forEach(card => {
+                card.style.transform = 'translateY(20px) scale(0.9)';
+                card.style.opacity = '0';
+                card.style.transition = 'all 0.3s ease-in-out';
+            });
+
+            // Enhanced button interactions
+            if (statsToggle) {
+                statsToggle.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.05) translateY(-2px)';
+                    this.style.boxShadow = '0 20px 40px rgba(0, 0, 0, 0.2)';
+                });
+
+                statsToggle.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1) translateY(0)';
+                    this.style.boxShadow = '0 10px 25px rgba(0, 0, 0, 0.15)';
+                });
+            }
+
+            // Typing effect
+            const typingText = document.querySelector('.typing-text');
+            if (typingText) {
+                const text = typingText.textContent;
+                typingText.textContent = '';
+                
+                let i = 0;
+                const typeWriter = () => {
+                    if (i < text.length) {
+                        typingText.textContent += text.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, 100);
+                    }
+                };
+                typeWriter();
+            }
+
+            // CTA Button hover effects
+            const ctaButton = document.querySelector('.cta-button');
+            if (ctaButton) {
+                ctaButton.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px) scale(1.05)';
+                });
+                
+                ctaButton.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            }
+        });
+    </script>
+</body>
+</html> 

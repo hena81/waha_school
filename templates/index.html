@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if school_settings and school_settings.school_name %}{{ school_settings.school_name }}{% else %}سجل بيانات المدرسة من الاعدادات{% endif %}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom Animations and Effects */
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(12deg); }
+            50% { transform: translateY(-20px) rotate(12deg); }
+        }
+        
+        @keyframes float-delayed {
+            0%, 100% { transform: translateY(0px) rotate(-12deg); }
+            50% { transform: translateY(-15px) rotate(-12deg); }
+        }
+        
+        @keyframes fade-in-up {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fade-in-left {
+            0% {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes fade-in-right {
+            0% {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes typing {
+            0% { width: 0; }
+            100% { width: 100%; }
+        }
+        
+        @keyframes blink {
+            0%, 50% { border-color: transparent; }
+            51%, 100% { border-color: white; }
+        }
+        
+
+        
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+
+        
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        .animate-float-delayed {
+            animation: float-delayed 8s ease-in-out infinite;
+        }
+        
+        .animate-fade-in-up {
+            animation: fade-in-up 1s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .animate-fade-in-left {
+            animation: fade-in-left 1s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .animate-fade-in-right {
+            animation: fade-in-right 1s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .animation-delay-200 { animation-delay: 0.2s; }
+        .animation-delay-400 { animation-delay: 0.4s; }
+        .animation-delay-600 { animation-delay: 0.6s; }
+        .animation-delay-800 { animation-delay: 0.8s; }
+        .animation-delay-1000 { animation-delay: 1s; }
+        
+        /* Additional Animation Delays */
+        .delay-1000 { animation-delay: 1s; }
+        .delay-2000 { animation-delay: 2s; }
+        .delay-3000 { animation-delay: 3s; }
+        
+        /* Enhanced Card Animations */
+        @keyframes fade-in-left {
+            0% {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes fade-in-right {
+            0% {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .animate-fade-in-left {
+            animation: fade-in-left 1s ease-out forwards;
+            opacity: 0;
+        }
+        
+        .animate-fade-in-right {
+            animation: fade-in-right 1s ease-out forwards;
+            opacity: 0;
+        }
+        
+        /* Typing Effect */
+        .typing-text {
+            display: inline-block;
+            overflow: visible;
+            white-space: nowrap;
+            border-right: 3px solid white;
+            animation: typing 3s steps(40, end), blink 0.75s step-end infinite;
+            line-height: 1.2;
+            padding: 0.1em 0;
+        }
+        
+
+        
+        /* Counter Animation */
+        .counter {
+            transition: all 0.3s ease;
+        }
+        
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .typing-text {
+                animation: none;
+                border-right: none;
+            }
+            
+            .particle {
+                display: none;
+            }
+            
+            .wave {
+                display: none;
+            }
+        }
+        
+        /* Enhanced Hover Effects */
+        .hover-glow:hover {
+            box-shadow: 0 0 30px rgba(255, 193, 7, 0.5);
+        }
+        
+        /* Glass Morphism Effect */
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Enhanced Button Styles */
+        .cta-button {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .cta-button:hover::before {
+            left: 100%;
+        }
+        
+        /* Fix for Arabic Text Clipping */
+        .overflow-visible {
+            overflow: visible !important;
+        }
+        
+        /* Enhanced Arabic Typography */
+        h1, h2, h3, h4, h5, h6 {
+            line-height: 1.4 !important;
+            padding: 0.1em 0 !important;
+        }
+        
+        /* Mobile Menu Button Styles */
+        #mobile-menu-button {
+            z-index: 50;
+            pointer-events: auto !important;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            transition: all 0.3s ease;
+        }
+        
+        #mobile-menu-button:hover {
+            background-color: rgba(255, 255, 255, 0.3) !important;
+            transform: scale(1.05);
+        }
+        
+        #mobile-menu-button:active {
+            background-color: rgba(255, 255, 255, 0.4) !important;
+            transform: scale(0.95);
+        }
+        
+        /* Mobile Menu Animation */
+        #mobile-menu {
+            transition: all 0.3s ease-in-out;
+        }
+        
+        /* Vision & Mission Cards Equal Height */
+        .vision-mission-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3rem;
+            align-items: stretch;
+        }
+        
+        @media (min-width: 1024px) {
+            .vision-mission-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .vision-mission-card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .vision-mission-card > div {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .vision-mission-card .card-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .vision-mission-card .card-text {
+            flex: 1;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        /* Ensure Arabic text displays properly */
+        .arabic-text {
+            text-rendering: optimizeLegibility;
+            font-feature-settings: "liga" 1, "kern" 1;
+        }
+        
+        /* News Section Specific Animations */
+        @keyframes slide-in-up {
+            0% {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-slide-in-up {
+            animation: slide-in-up 0.6s ease-out forwards;
+            opacity: 0;
+        }
+        
+        /* Staggered Animation Delays */
+        .animation-delay-100 { animation-delay: 0.1s; }
+        .animation-delay-200 { animation-delay: 0.2s; }
+        .animation-delay-300 { animation-delay: 0.3s; }
+        .animation-delay-400 { animation-delay: 0.4s; }
+        .animation-delay-500 { animation-delay: 0.5s; }
+        .animation-delay-600 { animation-delay: 0.6s; }
+        .animation-delay-700 { animation-delay: 0.7s; }
+        .animation-delay-800 { animation-delay: 0.8s; }
+        
+        /* News Card Hover Effects */
+        .news-card {
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .news-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+        }
+        
+        /* Image Zoom Effect */
+        .news-image {
+            transition: transform 0.5s ease;
+        }
+        
+        .news-card:hover .news-image {
+            transform: scale(1.1);
+        }
+        
+        /* Badge Animations */
+        .news-badge {
+            transition: all 0.3s ease;
+        }
+        
+        .news-badge:hover {
+            transform: scale(1.1);
+        }
+        
+        /* Button Hover Effects */
+        .news-button {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .news-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5);
+        }
+
+        /* توحيد ارتفاع كروت الأخبار */
+        .news-card {
+            height: 450px !important;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .news-card .bg-white\/90 {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .news-card .bg-white\/90 .relative.overflow-hidden.h-48 {
+            flex-shrink: 0;
+            height: 192px !important;
+        }
+
+        .news-card .bg-white\/90 .p-6 {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .news-card .bg-white\/90 .p-6 h3 {
+            flex-shrink: 0;
+        }
+
+        .news-card .bg-white\/90 .p-6 p {
+            flex: 1;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+
+        .news-card .bg-white\/90 .p-6 .text-center {
+            flex-shrink: 0;
+            margin-top: auto;
+        }
+
+        /* تحسينات للتصميم المتجاوب */
+        @media (max-width: 768px) {
+            .news-card {
+                height: 450px !important;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .news-card {
+                height: 420px !important;
+                max-width: 400px !important;
+                margin: 0 auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .news-card {
+                height: 420px !important;
+                max-width: 360px !important;
+                margin: 0 auto;
+            }
+        }
+    </style>
+</head>
+<body class="font-['Cairo'] bg-gray-50">
+
+    <!-- Combined Header and Hero Section -->
+    <section class="relative bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 overflow-hidden">
+        <!-- Static Gradient Background -->
+        <div class="absolute inset-0 bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900"></div>
+        
+        <!-- Overlay for Text Clarity -->
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
+        
+        <!-- Header Navigation -->
+        <div class="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-32 md:h-36 lg:h-40">
+                <!-- Right: Logo and School Name (Mobile Only) -->
+                <div class="flex items-center space-x-4 md:space-x-6 space-x-reverse">
+                    {% if school_settings and school_settings.school_logo %}
+                        <img src="/assets/images/{{ school_settings.school_logo }}" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto drop-shadow-lg">
+                    {% else %}
+                        {% if school_settings and school_settings.school_logo %}
+                            <img src="/assets/images/{{ school_settings.school_logo }}" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto drop-shadow-lg">
+                        {% else %}
+                            <img src="assets/images/logo.png" alt="شعار المدرسة" class="h-24 md:h-28 lg:h-32 w-auto drop-shadow-lg">
+                        {% endif %}
+                    {% endif %}
+                    <!-- School Name - Mobile Only -->
+                    <div class="md:hidden">
+                        <span class="text-base font-bold text-yellow-400 tracking-wide font-['Cairo','Noto Kufi Arabic',sans-serif] select-none">
+                            {% if school_settings and school_settings.school_name %}
+                                {{ school_settings.school_name }}
+                            {% else %}
+                                مدرسة الواحة الثانوية بنين
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+                
+                <!-- Left: Navigation & CTA -->
+                <div class="flex items-center space-x-2 space-x-reverse">
+                    <!-- Desktop Nav -->
+                    <nav class="hidden md:flex items-center space-x-6 space-x-reverse">
+                        <a href="#" class="px-4 py-2 rounded-lg text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">الرئيسية</a>
+                        <a href="#vision-mission" class="px-4 py-2 rounded-lg text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">الرؤية والرسالة</a>
+                        <a href="/news_all" class="px-4 py-2 rounded-lg text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">الأخبار</a>
+                        <a href="/activities" class="px-4 py-2 rounded-lg text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">معرض الأنشطة</a>
+                        <a href="/calendar" class="px-4 py-2 rounded-lg text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">التقويم المدرسي</a>
+                        <a href="#footer" class="px-4 py-2 rounded-lg text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">اتصل بنا</a>
+                        <a href="/student_login" class="px-4 py-2 rounded-lg text-base font-bold text-yellow-400 hover:text-white hover:bg-yellow-400/10 transition-all duration-300">صفحة الطالب</a>
+                        <a href="/login" class="px-4 py-2 rounded-lg text-base font-bold text-yellow-400 hover:text-white hover:bg-yellow-400/10 transition-all duration-300">تسجيل الدخول</a>
+                    </nav>
+                    
+                    <!-- Mobile menu button -->
+                    <button id="mobile-menu-button" onclick="toggleMobileMenu()" class="md:hidden flex items-center justify-center w-12 h-12 rounded-lg bg-white/20 text-white hover:bg-white/30 focus:outline-none focus:ring-2 focus:ring-yellow-300 transition-all duration-300 cursor-pointer border border-white/30" aria-label="فتح القائمة" type="button">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu" class="hidden md:hidden bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900/95 backdrop-blur-sm border-t border-white/10 z-50 relative">
+            <nav class="flex flex-col py-2 px-4 space-y-1">
+                <a href="#" class="block px-3 py-2 rounded-lg text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">الرئيسية</a>
+                <a href="#vision-mission" class="block px-3 py-2 rounded-lg text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">الرؤية والرسالة</a>
+                <a href="/news_all" class="block px-3 py-2 rounded-lg text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">الأخبار</a>
+                <a href="/activities" class="block px-3 py-2 rounded-lg text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">معرض الأنشطة</a>
+                <a href="/calendar" class="block px-3 py-2 rounded-lg text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">التقويم المدرسي</a>
+                <a href="#footer" class="block px-3 py-2 rounded-lg text-base font-medium text-white/90 hover:text-yellow-400 hover:bg-white/5 transition-all duration-300">اتصل بنا</a>
+                <a href="/student_login" class="block px-3 py-2 rounded-lg text-base font-bold text-yellow-400 hover:text-white hover:bg-yellow-400/10 transition-all duration-300">صفحة الطالب</a>
+                <a href="/login" class="block px-3 py-2 rounded-lg text-base font-bold text-yellow-400 hover:text-white hover:bg-yellow-400/10 transition-all duration-300">تسجيل الدخول</a>
+            </nav>
+        </div>
+        
+        <!-- Hero Content -->
+        <div class="relative z-10 container mx-auto px-6 flex flex-col justify-center items-center text-center pb-32">
+            <!-- Main Title with Typing Effect -->
+            <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-20 text-white drop-shadow-2xl leading-relaxed animate-fade-in-up animation-delay-200 overflow-visible mt-16">
+                <span class="typing-text">
+                    {% if school_settings and school_settings.school_name %}
+                        {{ school_settings.school_name }}
+                    {% else %}
+                        مدرسة الواحة الثانوية بنين
+                    {% endif %}
+                </span>
+            </h1>
+            
+            <!-- Subtitle -->
+            <p class="text-xl md:text-2xl lg:text-3xl mb-8 max-w-4xl text-white/90 drop-shadow-lg leading-relaxed animate-fade-in-up animation-delay-400">
+                صرح تعليمي يجمع بين الأصالة والمعاصرة لبناء جيل المستقبل
+            </p>
+            
+            <!-- Call to Action Button -->
+            <div class="animate-fade-in-up animation-delay-800 mt-8">
+                <a href="#vision-mission" class="cta-button group relative inline-flex items-center px-12 py-4 text-xl font-bold text-white bg-gradient-to-r from-yellow-500 to-yellow-600 rounded-full shadow-2xl hover:shadow-yellow-500/25 transition-all duration-500 transform hover:scale-105 hover:-translate-y-1 hover-glow">
+                    <span class="relative z-10">اكتشف المزيد</span>
+                    <div class="absolute inset-0 bg-gradient-to-r from-yellow-600 to-yellow-700 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <svg class="w-6 h-6 mr-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main>
+
+        <!-- Vision & Mission Section -->
+        <section id="vision-mission" class="py-20 bg-gradient-to-br from-white via-gray-50 to-blue-50 relative overflow-hidden">
+            <!-- Background Particles -->
+            <div class="absolute inset-0">
+                <div class="absolute top-20 left-10 w-2 h-2 bg-blue-400/30 rounded-full animate-pulse"></div>
+                <div class="absolute top-40 right-20 w-3 h-3 bg-purple-400/20 rounded-full animate-pulse delay-1000"></div>
+                <div class="absolute bottom-40 left-20 w-2 h-2 bg-green-400/30 rounded-full animate-pulse delay-2000"></div>
+                <div class="absolute bottom-20 right-10 w-3 h-3 bg-indigo-400/20 rounded-full animate-pulse delay-3000"></div>
+            </div>
+            
+            <div class="container mx-auto px-6 relative z-10">
+                <!-- Section Header -->
+                <div class="text-center mb-20 animate-fade-in-up">
+                    <h2 class="text-4xl md:text-5xl font-extrabold text-gray-800 mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent leading-relaxed overflow-visible">
+                        رؤيتنا ورسالتنا
+                    </h2>
+                    <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed overflow-visible">
+                        نحو تعليم يواكب تطلعات المستقبل ويبني جيلاً قادراً على الابتكار والريادة
+                    </p>
+                </div>
+                
+                <!-- Cards Grid -->
+                <div class="vision-mission-grid max-w-6xl mx-auto">
+                    <!-- Vision Card -->
+                    {% if school_settings and school_settings.school_vision %}
+                    <div class="group relative animate-fade-in-left vision-mission-card">
+                        <div class="bg-gradient-to-br from-blue-500/10 to-purple-600/10 backdrop-blur-sm rounded-3xl p-8 border border-blue-200/50 shadow-2xl hover:shadow-blue-500/25 transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 h-full flex flex-col">
+                            <!-- Card Header -->
+                            <div class="flex items-center mb-8">
+                                <div class="bg-gradient-to-br from-blue-500 to-purple-600 p-4 rounded-2xl mr-6 shadow-lg">
+                                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-3xl font-bold text-gray-800 mb-2 leading-relaxed overflow-visible">رؤية المدرسة</h3>
+                                    <div class="w-20 h-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Card Content -->
+                            <div class="space-y-6 card-content flex-1 flex flex-col">
+                                <p class="text-gray-700 leading-relaxed text-lg text-right card-text">
+                                    {{ school_settings.school_vision }}
+                                </p>
+                                
+
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Mission Card -->
+                    {% if school_settings and school_settings.school_mission %}
+                    <div class="group relative animate-fade-in-right vision-mission-card">
+                        <div class="bg-gradient-to-br from-green-500/10 to-teal-600/10 backdrop-blur-sm rounded-3xl p-8 border border-green-200/50 shadow-2xl hover:shadow-green-500/25 transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 h-full flex flex-col">
+                            <!-- Card Header -->
+                            <div class="flex items-center mb-8">
+                                <div class="bg-gradient-to-br from-green-500 to-teal-600 p-4 rounded-2xl mr-6 shadow-lg">
+                                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-3xl font-bold text-gray-800 mb-2 leading-relaxed overflow-visible">رسالة المدرسة</h3>
+                                    <div class="w-20 h-1 bg-gradient-to-r from-green-500 to-teal-600 rounded-full"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Card Content -->
+                            <div class="space-y-6 card-content flex-1 flex flex-col">
+                                <p class="text-gray-700 leading-relaxed text-lg text-right card-text">
+                                    {{ school_settings.school_mission }}
+                                </p>
+                                
+
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <!-- School Values Section -->
+                <div class="mt-20 animate-fade-in-up animation-delay-800">
+                    <!-- Section Header -->
+                    <div class="text-center mb-12">
+                        <div class="flex items-center justify-center mb-4">
+                            <div class="bg-gradient-to-br from-amber-500 to-orange-600 p-4 rounded-2xl ml-4 shadow-lg">
+                                <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-4xl md:text-5xl font-extrabold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">قيم المدرسة</h3>
+                        </div>
+                        <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                            القيم التي نغرسها في نفوس أبنائنا الطلاب
+                        </p>
+                    </div>
+
+                    <!-- Values Grid -->
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+                        <!-- الإبداع -->
+                        <div class="group relative animate-fade-in-up animation-delay-100" onclick="openValueModal('الإبداع', 'نشجع طلابنا على التفكير خارج الصندوق وإيجاد حلول مبتكرة للمشاكل', '💡')">
+                            <div class="bg-gradient-to-br from-blue-500/10 to-cyan-600/10 backdrop-blur-sm rounded-2xl p-6 border border-blue-200/50 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 cursor-pointer group-hover:border-blue-400/70">
+                                <div class="text-center">
+                                    <div class="text-5xl mb-3 transform group-hover:scale-110 transition-transform duration-300">💡</div>
+                                    <h4 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-blue-600 transition-colors duration-300">الإبداع</h4>
+                                    <p class="text-gray-600 text-xs">التفكير المبتكر والإبداعي</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- الانضباط -->
+                        <div class="group relative animate-fade-in-up animation-delay-200" onclick="openValueModal('الانضباط', 'نعلم طلابنا أهمية النظام والالتزام بالمواعيد والقوانين', '⚖️')">
+                            <div class="bg-gradient-to-br from-green-500/10 to-emerald-600/10 backdrop-blur-sm rounded-2xl p-6 border border-green-200/50 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 cursor-pointer group-hover:border-green-400/70">
+                                <div class="text-center">
+                                    <div class="text-5xl mb-3 transform group-hover:scale-110 transition-transform duration-300">⚖️</div>
+                                    <h4 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-green-600 transition-colors duration-300">الانضباط</h4>
+                                    <p class="text-gray-600 text-xs">النظام والالتزام</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- الإخلاص -->
+                        <div class="group relative animate-fade-in-up animation-delay-300" onclick="openValueModal('الإخلاص', 'نربي طلابنا على الإخلاص في العمل والوفاء بالعهود', '❤️')">
+                            <div class="bg-gradient-to-br from-red-500/10 to-pink-600/10 backdrop-blur-sm rounded-2xl p-6 border border-red-200/50 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 cursor-pointer group-hover:border-red-400/70">
+                                <div class="text-center">
+                                    <div class="text-5xl mb-3 transform group-hover:scale-110 transition-transform duration-300">❤️</div>
+                                    <h4 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-red-600 transition-colors duration-300">الإخلاص</h4>
+                                    <p class="text-gray-600 text-xs">الوفاء والإخلاص</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- الشفافية -->
+                        <div class="group relative animate-fade-in-up animation-delay-400" onclick="openValueModal('الشفافية', 'نشجع الطلاب على الصراحة والوضوح في التعامل مع الآخرين', '🔍')">
+                            <div class="bg-gradient-to-br from-purple-500/10 to-indigo-600/10 backdrop-blur-sm rounded-2xl p-6 border border-purple-200/50 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 cursor-pointer group-hover:border-purple-400/70">
+                                <div class="text-center">
+                                    <div class="text-5xl mb-3 transform group-hover:scale-110 transition-transform duration-300">🔍</div>
+                                    <h4 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-purple-600 transition-colors duration-300">الشفافية</h4>
+                                    <p class="text-gray-600 text-xs">الوضوح والصراحة</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- المسؤولية -->
+                        <div class="group relative animate-fade-in-up animation-delay-500" onclick="openValueModal('المسؤولية', 'نعلم طلابنا تحمل المسؤولية تجاه أنفسهم ومجتمعهم', '🛡️')">
+                            <div class="bg-gradient-to-br from-amber-500/10 to-yellow-600/10 backdrop-blur-sm rounded-2xl p-6 border border-amber-200/50 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 cursor-pointer group-hover:border-amber-400/70">
+                                <div class="text-center">
+                                    <div class="text-5xl mb-3 transform group-hover:scale-110 transition-transform duration-300">🛡️</div>
+                                    <h4 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-amber-600 transition-colors duration-300">المسؤولية</h4>
+                                    <p class="text-gray-600 text-xs">تحمل المسؤولية</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- الصدق -->
+                        <div class="group relative animate-fade-in-up animation-delay-600" onclick="openValueModal('الصدق', 'نربي طلابنا على الصدق والأمانة في جميع التعاملات', '✨')">
+                            <div class="bg-gradient-to-br from-teal-500/10 to-cyan-600/10 backdrop-blur-sm rounded-2xl p-6 border border-teal-200/50 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 cursor-pointer group-hover:border-teal-400/70">
+                                <div class="text-center">
+                                    <div class="text-5xl mb-3 transform group-hover:scale-110 transition-transform duration-300">✨</div>
+                                    <h4 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-teal-600 transition-colors duration-300">الصدق</h4>
+                                    <p class="text-gray-600 text-xs">الأمانة والصدق</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- الإيمان -->
+                        <div class="group relative animate-fade-in-up animation-delay-700" onclick="openValueModal('الإيمان', 'نغرس في طلابنا قيم الإيمان والتقوى والالتزام الديني', '🕌')">
+                            <div class="bg-gradient-to-br from-emerald-500/10 to-green-600/10 backdrop-blur-sm rounded-2xl p-6 border border-emerald-200/50 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 cursor-pointer group-hover:border-emerald-400/70">
+                                <div class="text-center">
+                                    <div class="text-5xl mb-3 transform group-hover:scale-110 transition-transform duration-300">🕌</div>
+                                    <h4 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-emerald-600 transition-colors duration-300">الإيمان</h4>
+                                    <p class="text-gray-600 text-xs">التقوى والإيمان</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- العدالة -->
+                        <div class="group relative animate-fade-in-up animation-delay-800" onclick="openValueModal('العدالة', 'نعلم طلابنا أهمية العدل والمساواة في التعامل مع الآخرين', '⚖️')">
+                            <div class="bg-gradient-to-br from-slate-500/10 to-gray-600/10 backdrop-blur-sm rounded-2xl p-6 border border-slate-200/50 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 cursor-pointer group-hover:border-slate-400/70">
+                                <div class="text-center">
+                                    <div class="text-5xl mb-3 transform group-hover:scale-110 transition-transform duration-300">⚖️</div>
+                                    <h4 class="text-2xl font-bold text-gray-800 mb-2 group-hover:text-slate-600 transition-colors duration-300">العدالة</h4>
+                                    <p class="text-gray-600 text-xs">العدل والمساواة</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- الإتقان -->
+                        <div class="group relative animate-fade-in-up animation-delay-900" onclick="openValueModal('الإتقان', 'نشجع طلابنا على الإتقان والتميز في جميع أعمالهم', '🏆')">
+                            <div class="bg-gradient-to-br from-rose-500/10 to-pink-600/10 backdrop-blur-sm rounded-2xl p-6 border border-rose-200/50 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 hover:scale-105 cursor-pointer group-hover:border-rose-400/70">
+                                <div class="text-center">
+                                    <div class="text-5xl mb-3 transform group-hover:scale-110 transition-transform duration-300">🏆</div>
+                                    <h4 class="text-xl font-bold text-gray-800 mb-2 group-hover:text-rose-600 transition-colors duration-300">الإتقان</h4>
+                                    <p class="text-gray-600 text-xs">التميز والإتقان</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Value Modal -->
+                <div id="valueModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+                    <div class="bg-white rounded-3xl p-8 max-w-md w-full mx-4 shadow-2xl transform transition-all duration-300 scale-95 opacity-0" id="modalContent">
+                        <div class="text-center">
+                            <div class="text-8xl mb-6" id="modalIcon"></div>
+                            <h3 class="text-3xl font-bold text-gray-800 mb-4" id="modalTitle"></h3>
+                            <p class="text-gray-600 leading-relaxed text-lg" id="modalDescription"></p>
+                            <button onclick="closeValueModal()" class="mt-8 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-xl font-medium hover:from-amber-600 hover:to-orange-700 transition-all duration-300 transform hover:scale-105 shadow-lg">
+                                إغلاق
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- News Section -->
+        <section id="news" class="pt-2 pb-20 bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 relative overflow-hidden">
+            <!-- Background Pattern -->
+            <div class="absolute inset-0 opacity-5">
+                <div class="absolute top-20 left-10 w-32 h-32 bg-blue-400 rounded-full blur-3xl"></div>
+                <div class="absolute bottom-20 right-10 w-40 h-40 bg-purple-400 rounded-full blur-3xl"></div>
+                <div class="absolute top-1/2 left-1/2 w-24 h-24 bg-green-400 rounded-full blur-2xl"></div>
+            </div>
+            
+            <div class="container mx-auto px-6 relative z-10">
+                <!-- Section Header -->
+                <div class="text-center mb-8 animate-fade-in-up">
+                    <h2 class="text-4xl md:text-5xl font-extrabold text-gray-800 mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                        آخر الأخبار والأحداث
+                    </h2>
+                    <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                        تابع أحدث مستجدات وأنشطة مدرستنا
+                    </p>
+                </div>
+                
+
+                
+                <!-- News Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                    {% for news in news_list %}
+                    <div class="group relative animate-fade-in-up animation-delay-{{ loop.index * 100 }} news-card">
+                        <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-3 hover:scale-105 overflow-hidden">
+                            <!-- News Image -->
+                            <div class="relative overflow-hidden h-48 bg-gradient-to-br from-gray-100 to-gray-200">
+                                {% if news.image %}
+                                <img src="/assets/images/news/{{ news.image }}" alt="صورة الخبر" class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-500">
+                                {% else %}
+                                <div class="w-full h-full bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center">
+                                    <svg class="w-16 h-16 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+                                        <path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Gradient Overlay -->
+                                <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                                
+                                <!-- Date Badge -->
+                                <div class="absolute top-4 right-4">
+                                    <div class="bg-white/90 backdrop-blur-sm text-gray-800 px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+                                        {{ news.date }}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- News Content -->
+                            <div class="p-6">
+                                <!-- News Title -->
+                                <h3 class="text-xl font-bold text-gray-800 mb-3 group-hover:text-blue-600 transition-colors duration-300 leading-relaxed overflow-visible">
+                                    <a href="/news/{{ news.id }}" class="hover:underline">{{ news.title }}</a>
+                                </h3>
+                                
+                                <!-- News Excerpt -->
+                                <p class="text-gray-600 leading-relaxed mb-4 text-right">
+                                    {{ news.details|striptags|truncate(100) }}
+                                </p>
+                                
+
+                                
+                                <!-- Read More Button -->
+                                <div class="text-center">
+                                    <a href="/news/{{ news.id }}" class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
+                                        اقرأ المزيد
+                                        <svg class="w-4 h-4 mr-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="col-span-full text-center py-16 animate-fade-in-up">
+                        <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-12 shadow-xl">
+                            <svg class="w-24 h-24 text-gray-300 mx-auto mb-6" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm-5 14H4v-4h11v4zm0-5H4V9h11v4zm5 5h-4V9h4v9z"/>
+                            </svg>
+                            <h3 class="text-2xl font-bold text-gray-600 mb-2">لا توجد أخبار حالياً</h3>
+                            <p class="text-gray-500">سنقوم بإضافة الأخبار قريباً</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                
+                <!-- View All News Button -->
+                {% if news_list|length > 0 %}
+                <div class="text-center animate-fade-in-up animation-delay-800">
+                    <a href="/news_all" class="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl text-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105 shadow-xl hover:shadow-2xl">
+                        عرض جميع الأخبار
+                        <svg class="w-6 h-6 mr-2 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        </svg>
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer Section -->
+    <footer id="footer" class="bg-gray-800 text-white pt-16 pb-8">
+        <div class="container mx-auto px-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+
+
+                <!-- Quick Links -->
+                <div class="col-span-1 md:col-span-2">
+                    <h4 class="text-xl font-bold mb-4">روابط سريعة</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white">الرئيسية</a></li>
+                        <li><a href="#vision-mission" class="text-gray-400 hover:text-white">الرؤية والرسالة</a></li>
+                        <li><a href="#news" class="text-gray-400 hover:text-white">الأخبار</a></li>
+                        
+                    </ul>
+                </div>
+
+                <!-- Contact Info -->
+                {% if school_settings and (school_settings.school_address or school_settings.school_phone or school_settings.school_email or school_settings.google_maps_url) %}
+                <div>
+                    <h4 class="text-xl font-bold mb-4">اتصل بنا</h4>
+                    <address class="not-italic text-gray-400 space-y-2">
+                        {% if school_settings.school_address or school_settings.google_maps_url %}
+                        <p>العنوان: 
+                            {% if school_settings.google_maps_url %}
+                                <a href="{{ school_settings.google_maps_url }}" target="_blank" class="hover:text-white">
+                                    {% if school_settings.school_address %}
+                                        {{ school_settings.school_address }}
+                                    {% else %}
+                                        الواحة - ق1 - جادة 1
+                                    {% endif %}
+                                </a>
+                            {% else %}
+                                <a href="https://maps.app.goo.gl/waWdwq4VbPoJpRXS9" target="_blank" class="hover:text-white">الواحة - ق1 - جادة 1</a>
+                            {% endif %}
+                        </p>
+                        {% endif %}
+                        {% if school_settings.school_phone %}
+                        <p>هاتف: 
+                            <a href="tel:{{ school_settings.school_phone }}" class="hover:text-white">{{ school_settings.school_phone }}</a>
+                        </p>
+                        {% endif %}
+                        {% if school_settings.school_email %}
+                        <p>بريد: 
+                            <a href="mailto:{{ school_settings.school_email }}" class="hover:text-white">{{ school_settings.school_email }}</a>
+                        </p>
+                        {% endif %}
+                        {% if school_settings.google_maps_url %}
+                        <p>
+                            <a href="{{ school_settings.google_maps_url }}" target="_blank" class="hover:text-white">الموقع</a>
+                        </p>
+                        {% endif %}
+                    </address>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col sm:flex-row justify-between items-center">
+                <p class="text-gray-500 text-sm mb-4 sm:mb-0">
+                    &copy; {{ current_year }} 
+                    {% if school_settings and school_settings.school_name %}
+                        {{ school_settings.school_name }}
+                    {% else %}
+                        سجل بيانات المدرسة من الاعدادات
+                    {% endif %}. 
+                    جميع الحقوق محفوظة.
+                </p>
+                <!-- Social Media Icons -->
+                {% if school_settings and (school_settings.telegram_url or school_settings.youtube_url or school_settings.snapchat_url or school_settings.instagram_url or school_settings.whatsapp_url) %}
+                <div class="flex justify-center space-x-8 rtl:space-x-reverse">
+                    <!-- تيليجرام -->
+                    {% if school_settings.telegram_url %}
+                    <a href="{{ school_settings.telegram_url }}" target="_blank" class="text-gray-400 hover:text-blue-400 mx-2 transition-colors duration-300">
+                        <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                    
+                    <!-- يوتيوب -->
+                    {% if school_settings.youtube_url %}
+                    <a href="{{ school_settings.youtube_url }}" target="_blank" class="text-gray-400 hover:text-red-500 mx-2 transition-colors duration-300">
+                        <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                    
+                    <!-- سناب شات -->
+                    {% if school_settings.snapchat_url %}
+                    <a href="{{ school_settings.snapchat_url }}" target="_blank" class="text-gray-400 hover:text-yellow-400 mx-2 transition-colors duration-300">
+                        <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12.206.793c.99 0 4.347.276 5.93 3.821.529 1.193.403 3.219.299 4.847l-.003.06c-.012.18-.022.345-.03.51.075.045.203.09.401.09.3-.016.659-.12 1.033-.301.165-.088.344-.104.464-.104.182 0 .359.029.509.09.45.149.734.479.734.838.015.449-.39.839-1.213 1.168-.089.029-.209.075-.344.119-.45.135-1.139.36-1.333.81-.09.224-.061.524.12.868l.015.015c.06.136 1.526 3.475 4.791 4.014.255.044.435.27.42.509 0 .075-.015.149-.045.225-.24.359-1.275.975-3.225 1.125-.046.193-.09.404-.127.613l-.007.046c-.044.195-.231.404-.607.404-.135 0-.313-.044-.538-.119-.36-.135-.87-.314-1.623-.314-.299 0-.614.015-.943.044-.854.09-1.438.344-1.956.659-.766.46-1.378.826-2.4.826-.015 0-.03 0-.044-.002h-.01c-1.005 0-1.636-.365-2.387-.825-.527-.314-1.127-.57-1.98-.66-.314-.029-.629-.044-.928-.044-.754 0-1.275.178-1.634.313-.225.074-.403.119-.537.119-.36 0-.557-.224-.586-.42-.037-.192-.077-.407-.117-.597-.15.002-.275.005-.425.005-1.964 0-2.995-.748-3.224-1.119a.55.55 0 0 1-.06-.327c-.014-.24.18-.465.42-.509 3.264-.54 4.73-3.879 4.791-4.02l.016-.029c.18-.345.224-.645.119-.869-.195-.434-.884-.658-1.332-.809a2.338 2.338 0 0 1-.36-.12c-.674-.271-1.104-.616-1.104-1.079 0-.374.299-.734.794-.883.15-.045.314-.075.465-.075.136 0 .27.015.404.09.39.181.764.284 1.065.284.205 0 .344-.044.433-.089.02-.165.015-.344.003-.52l-.003-.06c-.1-1.636-.225-3.662.314-4.84C7.933 1.077 11.354.793 12.206.793z"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                    
+                    <!-- انستجرام -->
+                    {% if school_settings.instagram_url %}
+                    <a href="{{ school_settings.instagram_url }}" target="_blank" class="text-gray-400 hover:text-pink-500 mx-2 transition-colors duration-300">
+                        <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                    
+                    <!-- واتساب -->
+                    {% if school_settings.whatsapp_url %}
+                    <a href="{{ school_settings.whatsapp_url }}" target="_blank" class="text-gray-400 hover:text-green-400 mx-2 transition-colors duration-300">
+                        <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.488"/>
+                        </svg>
+                    </a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </footer>
+
+
+    <script>
+    // دالة القائمة المنسدلة - يجب أن تكون في النطاق العام
+    function toggleMobileMenu() {
+        const mobileMenu = document.getElementById('mobile-menu');
+        if (mobileMenu) {
+            mobileMenu.classList.toggle('hidden');
+        }
+    }
+    
+    // إغلاق القائمة عند النقر خارجها
+    document.addEventListener('click', function(e) {
+        const mobileMenu = document.getElementById('mobile-menu');
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        
+        if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+            if (!mobileMenu.contains(e.target) && !mobileMenuButton.contains(e.target)) {
+                mobileMenu.classList.add('hidden');
+            }
+        }
+    });
+    
+    // إغلاق القائمة بمفتاح ESC
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenu && !mobileMenu.classList.contains('hidden')) {
+                mobileMenu.classList.add('hidden');
+            }
+        }
+    });
+    
+    // Smooth scroll للروابط الداخلية
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    });
+    </script>
+</body>
+</html>
